@@ -1,6 +1,6 @@
 from PIL import Image as pil_image
 def load_img(path, grayscale=False, target_size=None):
-    """
+    '''
     Loads an image into PIL format
     Notes: PIL image has format `(width, height, channel)`
            Numpy array has format `(height, width, channel)`
@@ -15,7 +15,7 @@ def load_img(path, grayscale=False, target_size=None):
 
     # Raises
         ..
-    """
+    '''
     try:
         img = pil_image.open(path)
     except IOError:
@@ -38,7 +38,7 @@ def load_img(path, grayscale=False, target_size=None):
 
 import numpy as np
 def img_to_array(img, data_format='channels_last'):
-    """
+    '''
     Converts a PIL Image instance to a Numpy array
     Notes: PIL image has format `(width, height, channel)`
            Numpy array has format `(height, width, channel)`
@@ -52,7 +52,7 @@ def img_to_array(img, data_format='channels_last'):
 
     # Raises
         ValueError: if invalid `img` or `data_format` is passed.
-    """
+    '''
     if img is None:
         return None
 
@@ -77,7 +77,7 @@ def img_to_array(img, data_format='channels_last'):
 
 from PIL import Image as pil_image
 def array_to_img(x, data_format='channels_last', scale=False):
-    """
+    '''
     Converts a 3D Numpy array to a PIL Image instance
     Notes: PIL image has format `(width, height, channel)`
            Numpy array has format `(height, width, channel)`
@@ -92,7 +92,7 @@ def array_to_img(x, data_format='channels_last', scale=False):
 
     # Raises
         ValueError: if invalid `x` or `data_format` is passed
-    """
+    '''
     if x.ndim != 3:
         raise ValueError('Image array to have rank 3.', x.shape)
 
@@ -119,7 +119,7 @@ def array_to_img(x, data_format='channels_last', scale=False):
 
 from PIL import Image as pil_image
 def is_valid_img(path):
-    """
+    '''
     Valid Image is ok
 
     # Arguments
@@ -130,7 +130,7 @@ def is_valid_img(path):
 
     # Raises
         ..
-    """
+    '''
     try:
         img = pil_image.open(path)
         img.verify()
@@ -146,7 +146,7 @@ def is_valid_img(path):
 import multiprocessing
 import numpy as np
 def get_image_iter(data, target_size=None, batch_size=32, shuffle=False, seed=None, image_gen=None):
-    """
+    '''
     A batch Iterator
 
     # Arguments
@@ -162,7 +162,7 @@ def get_image_iter(data, target_size=None, batch_size=32, shuffle=False, seed=No
 
     # Raises
         ..
-    """
+    '''
     fpaths = []
     labels = []
     for fpath, label in data:
@@ -206,7 +206,7 @@ def get_image_iter_job(fpath, target_size, image_gen):
 
 import numpy as np
 def get_index_iter(n, batch_size=1, shuffle=False, seed=None):
-    """
+    '''
     A batch Iterator
 
     # Arguments
@@ -220,7 +220,7 @@ def get_index_iter(n, batch_size=1, shuffle=False, seed=None):
 
     # Raises
         ..
-    """
+    '''
     epochs = 0
     batch_pos = 0
     while 1:
