@@ -44,7 +44,7 @@ class GenPlate(object):
             com = tfactor(com)
             com = random_envirment(com, self.no_plates_path)
             com = add_gauss(com, 1+r(4))
-            com = addNoise(com)
+            com = add_noise(com)
             return com
 
     def gen_text(self, pos, val):
@@ -61,14 +61,23 @@ class GenPlate(object):
                     text += chars[31+r(34)]
         return text
 
-    def gen_batch(self, batch_size, output_path, size):
-        if not os.path.exists(output_path):
-            os.mkdir(output_path)
+    def gen_batch(self, batch_size=1, output_path=None, size=(272, 72)):
+        '''
+        OpenCV默认颜色通道为BGR
+        RBG请自行转换: img = img[:,:,::-1]
+        '''
+        txts, imgs = [], []
         for i in range(batch_size):
             txt = self.gen_text(-1, -1)
             img = self.generate(txt)
-            img = cv2.resize(img, size)
-            cv2.imwrite('%s/%03d.jpg' % (output_path, i), img)
+            txts.append(txt)
+            imgs.append(cv2.resize(img, size))
+        if output_path is not None:
+            if not os.path.exists(output_path):
+                os.mkdirs(output_path)
+            for i, img in enumerate(imgs):
+                cv2.imwrite('%s/%03d.jpg' % (output_path, i), img)
+        return (txts, imgs)
 
 
 index = {'京': 0, '沪': 1, '津': 2, '渝': 3, '冀': 4, '晋': 5, '蒙': 6, '辽': 7, '吉': 8, '黑': 9, '苏': 10, '浙': 11, '皖': 12,
@@ -170,7 +179,7 @@ def add_noise_single_channel(single):
     return dst
 
 
-def addNoise(img,sdev = 0.5,avg=10):
+def add_noise(img,sdev = 0.5,avg=10):
     img[:,:,0] = add_noise_single_channel(img[:,:,0])
     img[:,:,1] = add_noise_single_channel(img[:,:,1])
     img[:,:,2] = add_noise_single_channel(img[:,:,2])

@@ -12,7 +12,7 @@ import sys
 sys.path.append('/data2/gits')
 from pyhej.genplate import genplate
 G = genplate.GenPlate()
-G.gen_batch(10, './temp', (272,72))
+res = G.gen_batch(10, './temp')
 
 from pyhej.image_view import get_plt_show
 get_plt_show(['./temp/%03d.jpg' % i for i in range(10)], height=0.3).show();
