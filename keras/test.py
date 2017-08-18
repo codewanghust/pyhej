@@ -1,5 +1,5 @@
 import numpy as np
-from pyhej.image import load_img, img_to_array
+from .image import load_img, img_to_array
 def predict_on_batch(model, data, datagen, target_size=None):
     """
     Predict on batch

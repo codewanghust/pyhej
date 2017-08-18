@@ -1,6 +1,6 @@
 import codecs
-from pyhej.trie import Trie
-from pyhej.string import name_std
+from .trie import Trie
+from .string import name_std
 class Faster(object):
     """docstring for Faster"""
     def __init__(self, data):

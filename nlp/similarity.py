@@ -37,8 +37,8 @@ class EditDistance(object):
 
 
 import editdistance
-from pyhej.trie import Trie
-from pyhej.string import name_std
+from .trie import Trie
+from .string import name_std
 class Similarity(object):
     starts = Trie()
     ends = Trie()

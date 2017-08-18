@@ -17,6 +17,3 @@ def name_std(text):
     tmp = re.sub(r'[\s,，]+', ' ', tmp)
     return tmp
 
-
-if __name__ == '__main__':
-    print(name_std('我们  我们,我们，(我们)（我们）'))
