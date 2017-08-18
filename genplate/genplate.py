@@ -64,7 +64,7 @@ class GenPlate(object):
     def gen_batch(self, batch_size=1, output_path=None, size=(272, 72)):
         '''
         OpenCV默认颜色通道为BGR
-        RBG请自行转换: img = img[:,:,::-1]
+        RGB请自行转换: img = img[:,:,::-1]
         '''
         txts, imgs = [], []
         for i in range(batch_size):
