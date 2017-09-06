@@ -24,8 +24,8 @@ def groupx(words):
     maps = {}
     for word in words:
         maps[word] = maps.get(word, 0) + 1
-    temp = sorted(maps.items(), key=lambda x: x[1], reverse=True)
-    return (temp[0][0], temp[0][1], sum(maps.values()), json.dumps(maps))
+    temp = sorted(maps.items(), key=lambda x: x[1])[-1]
+    return (temp[0], temp[1], maps)
 
 
 def mergex(groups, threshold=0.8):
@@ -43,8 +43,7 @@ def mergex(groups, threshold=0.8):
                     if s > threshold:
                         pairs.append((i, j, s))
     if len(pairs) > 0:
-        pairs = sorted(pairs, key=lambda x: x[2], reverse=True)
-        for i, j, s in pairs:
+        for i, j, s in sorted(pairs, key=lambda x: x[2], reverse=True):
             igroup = groups[i]
             jgroup = groups[j]
             if igroup[-1] and jgroup[-1]:
@@ -74,8 +73,7 @@ def mergex_weight(groups, threshold=0.8):
                     if s > threshold:
                         pairs.append((i, j, s))
     if len(pairs) > 0:
-        pairs = sorted(pairs, key=lambda x: x[2], reverse=True)
-        for i, j, s in pairs:
+        for i, j, s in sorted(pairs, key=lambda x: x[2], reverse=True):
             igroup = groups[i]
             jgroup = groups[j]
             if igroup[-1] and jgroup[-1]:
