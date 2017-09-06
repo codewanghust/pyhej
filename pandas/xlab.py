@@ -25,7 +25,7 @@ def groupx(words):
     for word in words:
         maps[word] = maps.get(word, 0) + 1
     temp = sorted(maps.items(), key=lambda x: x[1], reverse=True)
-    return (temp[0][0], temp[0][1], sum(maps.values()), maps)
+    return (temp[0][0], temp[0][1], sum(maps.values()), json.dumps(maps))
 
 
 def mergex(groups, threshold=0.8):
