@@ -8,16 +8,12 @@ pip install pillow opencv numpy
 
 运行示例:
 ```
-import sys
-sys.path.append('/path/to/pyhej-parent')
-
 from pyhej.genplate import genplate
 G = genplate.GenPlate()
 txts, imgs = G.gen_batch(9, './temp')
 
 from pyhej.keras import image_view
-
-image_view.image_show_path(['./temp/%03d.jpg' % i for i in range(len(txts))], col=3, height=0.3).show()
+image_view.image_show_path(['./temp/%03d.jpg'%i for i in range(len(txts))], col=3, height=0.3).show()
 
 image_view.image_show_imgs(imgs, col=3, height=0.3, mode='bgr').show()
 ```

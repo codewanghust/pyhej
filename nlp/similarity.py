@@ -1,4 +1,8 @@
 import editdistance
+from .trie import Trie
+from .string import normalize
+
+
 class EditDistance(object):
     def __init__(self, words):
         self.words = list(words)
@@ -7,7 +11,7 @@ class EditDistance(object):
         temp_list = []
         for item in self.words:
             temp = self.dist(word, item)
-            temp_list.append((item, temp['sim']))
+            temp_list.append((item, temp[1]))
         temp_list = sorted(temp_list, key=lambda x: x[1])
         if len(temp_list) < n:
             return temp_list
@@ -16,15 +20,14 @@ class EditDistance(object):
     def dist(self, str1, str2):
         num_dist = editdistance.eval(str1, str2)
         num_sim = 1 - num_dist / max(len(str1), len(str2))
-        return {'dist': num_dist, 'sim': num_sim}
+        return (num_dist, num_sim)
 
     def topn(self, n, *args):
         temp_list = []
         for arg in args:
             temp_list.extend(arg)
         temp_list = sorted(temp_list, key=lambda x: x[1])
-        keys = []
-        vals = []
+        keys, vals = [], []
         while 1:
             if len(keys) < n and len(temp_list) > 0:
                 key, val = temp_list.pop()
@@ -36,13 +39,9 @@ class EditDistance(object):
         return (keys, vals)
 
 
-import editdistance
-from .trie import Trie
-from .string import name_std
 class Similarity(object):
     starts = Trie()
     ends = Trie()
-
     data = []
 
     def __init__(self, starts, ends):
@@ -66,7 +65,7 @@ class Similarity(object):
             self.data.append((name, prefix, core, suffix, tag_e, tag_s))
 
     def split(self, word):
-        word = name_std(word)
+        word = normalize(word)
         pos_s, tag_s = self.starts.match(word)
         pos_e, tag_e = self.ends.match_reverse(word)
         if pos_s is None:
@@ -136,8 +135,7 @@ class Similarity(object):
 
     def best(self, n, data):
         temp_list = sorted(data, key=lambda x: x[1])
-        keys = []
-        vals = []
+        keys, vals = [], []
         while 1:
             if len(keys) < n and len(temp_list) > 0:
                 key, val = temp_list.pop()
@@ -149,12 +147,11 @@ class Similarity(object):
         return (keys, vals)
 
     def topn(self, n, *args):
-        data = []
+        temp_list = []
         for arg in args:
-            data.extend(arg)
-        temp_list = sorted(data, key=lambda x: x[1])
-        keys = []
-        vals = []
+            temp_list.extend(arg)
+        temp_list = sorted(temp_list, key=lambda x: x[1])
+        keys, vals = [], []
         while 1:
             if len(keys) < n and len(temp_list) > 0:
                 key, val = temp_list.pop()

@@ -1,6 +1,7 @@
 import codecs
 from .trie import Trie
-from .string import name_std
+
+
 class Faster(object):
     """docstring for Faster"""
     def __init__(self, data):
@@ -26,3 +27,4 @@ class Faster(object):
 
     def find(self, word):
         return self.trie.find(word)
+

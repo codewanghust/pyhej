@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import math
 
+
 class GenPlate(object):
     def __init__(self, font_zh=None, font_en=None, no_plates=None):
         wise_dir = os.path.dirname(__file__)

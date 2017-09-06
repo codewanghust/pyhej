@@ -1,5 +1,4 @@
 class Trie(object):
-
     def __init__(self):
         self.root = {}
         self.END = '/'
@@ -49,10 +48,3 @@ class Trie(object):
     def delete_reverse(self, word):
         return self.delete(word[::-1])
 
-
-if __name__ == '__main__':
-    my_trie = Trie()
-    res_1 = my_trie.find('何剑')
-    my_trie.add('何剑', 'tag_good')
-    res_2 = my_trie.find('何剑')
-    print('test:', res_1, res_2, sep='\n\t')

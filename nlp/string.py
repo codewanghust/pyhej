@@ -1,8 +1,27 @@
 import re
+
+
+def full2half(word):
+    chars = []
+    for c in word:
+        num = ord(c)
+        if num == 0x3000:
+            chars.append(chr(0x20))
+        elif 0xFF01 <= num <= 0xFF5E:
+            chars.append(chr(num - 0xFEE0))
+        else:
+            chars.append(c)
+    return ''.join(chars)
+
+
 def normalize(text):
-    tmp = text.lower()
-    tmp = re.sub(r'[\s,]+', ' ', tmp)
-    return tmp.strip()
+    if isinstance(text, str):
+        tmp = full2half(text)
+        tmp = tmp.lower()
+        tmp = re.sub(r'[\s,]+', ' ', tmp)
+        return tmp.strip()
+    else:
+        return text
 
 
 class Converter(object):
@@ -47,7 +66,8 @@ class Converter(object):
 
 
 class Counter(object):
-    '''字符统计
+    '''字符统计器
+    排除字符,可选:汉字,字母,数字
     '''
     def __init__(self):
         self.data = {}
