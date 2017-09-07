@@ -21,7 +21,7 @@ def normalize(text):
         tmp = re.sub(r'[\s,]+', ' ', tmp)
         return tmp.strip()
     else:
-        return text
+        return ''
 
 
 class Converter(object):
