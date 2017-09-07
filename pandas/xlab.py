@@ -38,8 +38,8 @@ def mergex(groups, threshold=0.8):
             for j in range(i+1, total):
                 jgroup = groups[j]
                 if jgroup[-1]:
-                    nkeys = igroup[1].keys() & jgroup[1].keys()
-                    s = len(nkeys) / min(len(igroup[1]), len(jgroup[1]))
+                    keys = igroup[1].keys() & jgroup[1].keys()
+                    s = len(keys) / min(len(igroup[1]), len(jgroup[1]))
                     if s > threshold:
                         pairs.append((i, j, s))
     if len(pairs) > 0:
@@ -66,10 +66,9 @@ def mergex_weight(groups, threshold=0.8):
             for j in range(i+1, total):
                 jgroup = groups[j]
                 if jgroup[-1]:
-                    nmaps = {}
-                    for key in igroup[1].keys() & jgroup[1].keys():
-                        nmaps[key] = min(igroup[1].get(key, 0), jgroup[1].get(key, 0))
-                    s = sum(nmaps.values()) / min(sum(igroup[1].values()), sum(jgroup[1].values()))
+                    keys = igroup[1].keys() & jgroup[1].keys()
+                    isum, jsum = sum(igroup[1].values()), sum(jgroup[1].values())
+                    s = sum([min(igroup[1].get(key)/isum, jgroup[1].get(key)/jsum) for key in keys])
                     if s > threshold:
                         pairs.append((i, j, s))
     if len(pairs) > 0:
