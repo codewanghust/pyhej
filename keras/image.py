@@ -1,3 +1,11 @@
+import re
+
+
+URL_REGEX = re.compile(r'http://|https://|ftp://')
+
+
+import requests
+from io import BytesIO
 from PIL import Image as pil_image
 def load_img(path, grayscale=False, target_size=None):
     '''
@@ -6,7 +14,7 @@ def load_img(path, grayscale=False, target_size=None):
            Numpy array has format `(height, width, channel)`
 
     # Arguments
-        path: Path to image file
+        path: Path to image file or url
         grayscale: Boolean, whether to load the image as grayscale
         target_size: `None` or tuple of ints `(height, width)`
 
@@ -17,7 +25,11 @@ def load_img(path, grayscale=False, target_size=None):
         ..
     '''
     try:
-        img = pil_image.open(path)
+        if URL_REGEX.match(path) is not None:
+            response = requests.get(url)
+            img = pil_image.open(BytesIO(response.content))
+        else:
+            img = pil_image.open(path)
     except IOError:
         return None
 
