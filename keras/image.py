@@ -26,7 +26,7 @@ def load_img(path, grayscale=False, target_size=None):
     '''
     try:
         if URL_REGEX.match(path) is not None:
-            response = requests.get(url)
+            response = requests.get(path)
             img = pil_image.open(BytesIO(response.content))
         else:
             img = pil_image.open(path)
