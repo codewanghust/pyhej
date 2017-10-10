@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-
 from .image import load_img
 def image_show_path(imgs, col=5, height=1.0, target_size=None):
     row = int(len(imgs)/col) + 1
@@ -17,6 +16,8 @@ def image_show_path(imgs, col=5, height=1.0, target_size=None):
     return plt
 
 
+import matplotlib.pyplot as plt
+from .image import load_img
 def image_show_imgs(imgs, col=5, height=1.0, mode='rgb'):
     row = int(len(imgs)/col) + 1
     plt.figure(figsize=(18, int(row/col*18*height)))

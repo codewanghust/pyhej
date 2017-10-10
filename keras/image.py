@@ -25,7 +25,7 @@ def load_img(path, grayscale=False, target_size=None):
         ..
     '''
     try:
-        if URL_REGEX.match(path) is not None:
+        if URL_REGEX.match(path):
             response = requests.get(path)
             img = pil_image.open(BytesIO(response.content))
         else:
@@ -203,7 +203,7 @@ def get_image_iter(data, target_size=None, batch_size=32, shuffle=False, seed=No
             batch_x[i] = obj.get()
 
         for i, index in enumerate(batch_index):
-            batch_y[i, labels[index]] = 1.
+            batch_y[i, labels[index]] = 1.0
 
         yield (batch_x, batch_y)
 
