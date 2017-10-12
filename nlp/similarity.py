@@ -3,6 +3,21 @@ from .trie import Trie
 from .string import normalize
 
 
+def tool_ngram_skip(text, skip=1):
+    tmp = '?' * skip
+    return [i+j for i,j in zip(tmp+text, text+tmp)]
+
+
+def tool_similarity_ngram(lstr, rstr):
+    lset = set(tool_ngram_skip(lstr))
+    rset = set(tool_ngram_skip(rstr))
+    return 2 * len(lset & rset) / (len(lset) + len(rset))
+
+
+def tool_similarity_editdistance(lstr, rstr):
+    return 1 - editdistance.eval(lstr, rstr) / max(1, len(lstr), len(rstr))
+
+
 class EditDistance(object):
     def __init__(self, words):
         self.words = list(words)
