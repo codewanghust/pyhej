@@ -103,7 +103,7 @@ class Counter(object):
             elif 97 <= ord(key) <= 122:
                 if eng:
                     temp.append((key, val))
-            elif 19968 <= ord(key) <= 40869:
+            elif 19968 <= ord(key) <= 40959:
                 if han:
                     temp.append((key, val))
             else:
@@ -112,6 +112,10 @@ class Counter(object):
         return temp
 
 
+# 汉字编码范围:
+#   [\u4E00-\u9FFF]
+#   `ord('\u4E00') <=> chr(19968)`
+#   `ord('\u9FFF') <=> chr(40959)`
 def tool_char_tagging(c):
     i = ord(c)
     if 48 <= i <= 57:
@@ -120,7 +124,7 @@ def tool_char_tagging(c):
         return 'en'
     elif 97 <= i <= 122:
         return 'en'
-    elif 19968 <= i <= 40869:
+    elif 19968 <= i <= 40959:
         return 'zh'
     else:
         return 'o'
@@ -140,6 +144,8 @@ def tool_text_group(text):
     return res
 
 
+# 中日韩字符编码范围:
+#   [\u2E80-\u9FFF]
 re_none = re.compile('\S', re.U)
 re_split = re.compile('([0-9]+|[a-z-]+|[\u2E80-\u9FFF]+)', re.U)
 def tool_text_split(text):
