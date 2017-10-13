@@ -1,4 +1,5 @@
 import re
+import itertools
 
 
 def full2half(word):
@@ -109,4 +110,46 @@ class Counter(object):
                 temp.append((key, val))
         temp = sorted(temp, key=lambda x: x[1], reverse=False)
         return temp
+
+
+def tool_char_tagging(c):
+    i = ord(c)
+    if 48 <= i <= 57:
+        return 'd'
+    elif 65 <= i <= 90:
+        return 'en'
+    elif 97 <= i <= 122:
+        return 'en'
+    elif 19968 <= i <= 40869:
+        return 'zh'
+    else:
+        return 'o'
+
+
+def tool_text_group(text):
+    res = []
+    tmp, tag = [], ''
+    for c in text:
+        tag_cur = tool_char_tagging(c)
+        if tag_cur == tag:
+            tmp.append(c)
+        else:
+            res.append((tag, ''.join(tmp)))
+            tmp, tag = [c], tag_cur
+    res.append((tag, ''.join(tmp)))
+    return res
+
+
+re_none = re.compile('\S', re.U)
+re_split = re.compile('([0-9]+|[a-z-]+|[\u2E80-\u9FFF]+)', re.U)
+def tool_text_split(text):
+    return [i for i in re_split.split(text) if re_none.match(i)]
+
+
+re_sub_r1 = re.compile('\s*(?:\d+)\s*(a|ma|g|kg|t|m|mm|cm|dm|km|安|安培|克|千克|吨|米|毫米|厘米|分米|千米|$)', re.U)
+re_sub_r2 = re.compile('(^|[^a-z])(?:i|ii|iii|iv|v|vi|vii|viii)([^a-z]|$)', re.U)
+def tool_text_sub(text):
+    text = re_sub_r1.sub(r'*', text)
+    text = re_sub_r2.sub(r'\1*\2', text)
+    return text
 
