@@ -146,8 +146,8 @@ def tool_text_split(text):
     return [i for i in re_split.split(text) if re_none.match(i)]
 
 
-re_sub_r1 = re.compile('\s*(?:\d+)\s*(a|ma|g|kg|t|m|mm|cm|dm|km|安|安培|克|千克|吨|米|毫米|厘米|分米|千米|$)', re.U)
-re_sub_r2 = re.compile('(^|[^a-z])(?:i|ii|iii|iv|v|vi|vii|viii)([^a-z]|$)', re.U)
+re_sub_r1 = re.compile('\s*(?:\d+)\s*(?:a|ma|g|kg|t|m|mm|cm|dm|km)(?:[^a-z]|$)', re.U)
+re_sub_r2 = re.compile('(^|[^a-z0-9*])(?:i|ii|iii|iv|v|vi|vii|viii)([^a-z0-9*]|$)', re.U)
 def tool_text_sub(text):
     text = re_sub_r1.sub(r'*', text)
     text = re_sub_r2.sub(r'\1*\2', text)
