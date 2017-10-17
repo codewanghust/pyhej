@@ -146,10 +146,10 @@ def tool_text_group(text):
 
 # 中日韩字符编码范围:
 #   [\u2E80-\u9FFF]
-re_none = re.compile('\S', re.U)
+re_text = re.compile('^\S', re.U)
 re_split = re.compile('([\+\-]?(?:\d+(?:[.]\d*)?|[.]\d+)|[a-z\-]+|[\u2E80-\u9FFF]+)', re.U)
 def tool_text_split(text):
-    return [i for i in re_split.split(text) if re_none.match(i)]
+    return [i for i in re_split.split(text) if re_text.match(i)]
 
 
 # 汉字编码范围:
