@@ -147,15 +147,27 @@ def tool_text_group(text):
 # 中日韩字符编码范围:
 #   [\u2E80-\u9FFF]
 re_none = re.compile('\S', re.U)
-re_split = re.compile('([0-9]+|[a-z-]+|[\u2E80-\u9FFF]+)', re.U)
+re_split = re.compile('([\+\-]?(?:\d+(?:[.]\d*)?|[.]\d+)|[a-z\-]+|[\u2E80-\u9FFF]+)', re.U)
 def tool_text_split(text):
     return [i for i in re_split.split(text) if re_none.match(i)]
 
 
-re_sub_r1 = re.compile('\s*(?:\d+)\s*(?:a|ma|g|kg|t|m|mm|cm|dm|km)(?:[^a-z]|$)', re.U)
-re_sub_r2 = re.compile('(^|[^a-z0-9*])(?:i|ii|iii|iv|v|vi|vii|viii)([^a-z0-9*]|$)', re.U)
+# 汉字编码范围:
+#   [\u4E00-\u9FFF]
+#   `ord('\u4E00') <=> chr(19968)`
+#   `ord('\u9FFF') <=> chr(40959)`
+#   中日韩字符编码范围: [\u2E80-\u9FFF]
+re_sub_r1 = re.compile('\(.*?\)', re.U)
+re_sub_r2 = re.compile('[\-\s]+([\u2E80-\u9FFF]+)[\-\s]*|([\u2E80-\u9FFF]+)[\-\s]+', re.U)
+re_sub_r3 = re.compile('[-+#/]?\s*(?:\d+(?:[.]\d*)?|[.]\d+)\s*', re.U)
+re_sub_r4 = re.compile('[*](?:a|ma|g|kg|t|m|nm|mm|cm|dm|km)(?=[^a-z]|$)', re.U)
+re_sub_r5 = re.compile('((?<=[^a-z])(?:version|ver|v))?(?:[\-\s]+)?[*]$', re.U)
 def tool_text_sub(text):
-    text = re_sub_r1.sub(r'*', text)
-    text = re_sub_r2.sub(r'\1*\2', text)
-    return text
+    text = text.strip()
+    text = re_sub_r1.sub(r'', text)
+    text = re_sub_r2.sub(r'\1\2', text)
+    text = re_sub_r3.sub(r'*', text)
+    text = re_sub_r4.sub(r'*', text)
+    text = re_sub_r5.sub(r'*', text)
+    return text.strip()
 
