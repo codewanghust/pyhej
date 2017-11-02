@@ -2,7 +2,6 @@ import SimpleITK as sitk
 import dicom
 import numpy as np
 import cv2
-from PIL import Image as pil_image
 
 
 '''
@@ -59,6 +58,7 @@ def img_array_opti(img_array, limit=4.0, scale=True):
 '''
 a, b, c = img_array[0], img_array_scale(img_array)[0], img_array_opti(img_array)[0]
 
+from PIL import Image as pil_image
 tmp = pil_image.fromarray(a, mode='L')
 tmp.save('1.a.jpg')
 tmp = pil_image.fromarray(b, mode='L')
@@ -81,3 +81,4 @@ ax.imshow(c, plt.cm.bone)
 ax.set_title('c')
 plt.show()
 '''
+
