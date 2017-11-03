@@ -40,8 +40,7 @@ def read_dicom(filename):
     ## frames, wid, hei = img_array.shape
     ## plt.imshow(img_array[frame_num], plt.cm.bone)
     ## plt.show()
-    plan = dicom.read_file(filename, force=True)
-    return img_array, plan.Modality, plan.XRayTubeCurrent, plan.ImagePositionPatient, plan.SeriesTime
+    return img_array
 
 
 def img_array_scale(img_array):
