@@ -10,6 +10,25 @@ pip install pydicom
 '''
 
 
+def read_dicominfo(filename):
+    try:
+        plan = dicom.read_file(filename, force=True)
+        temp = {'InstitutionName': plan.InstitutionName,  # 机构
+               'PatientID': plan.PatientID,  # 病人
+               'PatientName': plan.PatientName,  # 病人
+               'StudyDate': plan.StudyDate,  # study
+               'StudyTime': plan.StudyTime,  # study
+               'Modality': plan.Modality,  # 项目
+               'XRayTubeCurrent': plan.XRayTubeCurrent,  # 强度
+               'ImagePositionPatient': plan.ImagePositionPatient,  # 位置
+               'SeriesDate': plan.SeriesDate,  # series
+               'SeriesTime': plan.SeriesTime,  # series
+               'InstanceNumber': plan.InstanceNumber}  # 序号
+    except Exception as e:
+        temp = None
+    return temp
+
+
 def read_dicom(filename):
     '''
     read dicom file
@@ -22,7 +41,7 @@ def read_dicom(filename):
     ## plt.imshow(img_array[frame_num], plt.cm.bone)
     ## plt.show()
     plan = dicom.read_file(filename, force=True)
-    return img_array, plan.Modality, plan.XRayTubeCurrent
+    return img_array, plan.Modality, plan.XRayTubeCurrent, plan.ImagePositionPatient, plan.SeriesTime
 
 
 def img_array_scale(img_array):
