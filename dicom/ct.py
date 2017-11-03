@@ -21,8 +21,8 @@ def read_dicominfo(filename):
                'Modality': plan.Modality,  # 项目
                'XRayTubeCurrent': plan.XRayTubeCurrent,  # 强度
                'ImagePositionPatient': plan.ImagePositionPatient,  # 位置
-               'SeriesDate': plan.SeriesDate,  # series
                'SeriesTime': plan.SeriesTime,  # series
+               'ExposureTime': plan.ExposureTime,  # exposure
                'InstanceNumber': plan.InstanceNumber}  # 序号
     except Exception as e:
         temp = None
