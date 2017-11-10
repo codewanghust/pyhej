@@ -1,5 +1,7 @@
 import os
+import time
 import torch
+import shutil
 
 
 class AverageMeter(object):
@@ -27,7 +29,7 @@ def adjust_learning_rate(optimizer, epoch, init_lr):
         param_group['lr'] = lr
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(output, target, topk=(1, 5)):
     '''Computes the precision@k for the specified values of k'''
     maxk = max(topk)
     batch_size = target.size(0)
@@ -52,7 +54,7 @@ def save_checkpoint(state, is_best, file_path='tmp'):
         shutil.copyfile(file_name, os.path.join(file_path, 'model_best.pth.tar'))
 
 
-def validate(val_loader, model, criterion, print_freq=1000):
+def validate(val_loader, model, criterion, topk=(1, 5), print_freq=1000):
     batch_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -63,6 +65,7 @@ def validate(val_loader, model, criterion, print_freq=1000):
 
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
+        target = target.cuda(async=True)
         input_var = torch.autograd.Variable(input, volatile=True)
         target_var = torch.autograd.Variable(target, volatile=True)
 
@@ -71,7 +74,7 @@ def validate(val_loader, model, criterion, print_freq=1000):
 
         # measure accuracy and record loss
         loss = criterion(output, target_var)
-        prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+        prec1, prec5 = accuracy(output.data, target, topk)
 
         losses.update(loss.data[0], input.size(0))
         top1.update(prec1[0], input.size(0))

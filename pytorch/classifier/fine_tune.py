@@ -1,4 +1,5 @@
 import os
+import time
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -25,7 +26,7 @@ def get_model(name, pretrained, cuda=True, num_class=2):
     return model
 
 
-def train(train_loader, model, criterion, optimizer, epoch, print_freq=1000):
+def train(train_loader, model, criterion, optimizer, epoch, topk=(1, 5), print_freq=1000):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -40,6 +41,7 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq=1000):
         # measure data loading time
         data_time.update(time.time() - end)
 
+        target = target.cuda(async=True)
         input_var = torch.autograd.Variable(input)
         target_var = torch.autograd.Variable(target)
 
@@ -48,7 +50,7 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq=1000):
 
         # measure accuracy and record loss
         loss = criterion(output, target_var)
-        prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+        prec1, prec5 = accuracy(output.data, target, topk)
 
         losses.update(loss.data[0], input.size(0))
         top1.update(prec1[0], input.size(0))
@@ -74,7 +76,7 @@ def train(train_loader, model, criterion, optimizer, epoch, print_freq=1000):
                    data_time=data_time, loss=losses, top1=top1, top5=top5))
 
 
-def todo(args):
+def todo(args, topk=(1, 5)):
     args.best_prec1 = 0
 
     # create model
@@ -133,10 +135,10 @@ def todo(args):
         adjust_learning_rate(optimizer, epoch, args.lr)
 
         # train for one epoch
-        train(train_loader, model, criterion, optimizer, epoch, args.print_freq)
+        train(train_loader, model, criterion, optimizer, epoch, topk, args.print_freq)
 
         # evaluate on validation set
-        prec1 = validate(val_loader, model, criterion, args.print_freq)
+        prec1 = validate(val_loader, model, criterion, topk, args.print_freq)
 
         # remember best prec@1 and save checkpoint
         is_best = prec1 > args.best_prec1
@@ -160,7 +162,7 @@ parser.add_argument('--name', default='resnet18', type=str, help='model name')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true')
 parser.add_argument('-j', '--workers', default=4, type=int)
 parser.add_argument('--cuda', dest='cuda', action='store_true')
-parser.add_argument('-b', '--batch-size', default=256, type=int)
+parser.add_argument('-b', '--batch-size', default=64, type=int)
 parser.add_argument('--epochs', default=90, type=int)
 parser.add_argument('--start-epoch', default=0, type=int)
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float)
@@ -168,7 +170,8 @@ parser.add_argument('--momentum', default=0.9, type=float)
 parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float)
 parser.add_argument('--resume', default='', type=str)
 parser.add_argument('--print-freq', '-p', default=1000, type=int)
-parser.add_argument('--output', default='tmp', type=str)
-args = parser.parse_args(['/data2/datasets/kaggle-dog-vs-cat/tmp', '--cuda', '--output', '/data2/tmps'])
-todo(args)
+parser.add_argument('--output', default='/data2/tmps', type=str)
+args = parser.parse_args(['/data2/datasets/kaggle-dog-vs-cat/tmp', '--cuda'])
+print(args)
+todo(args, topk=(1, 1))
 '''
