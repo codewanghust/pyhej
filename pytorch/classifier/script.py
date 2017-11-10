@@ -1,12 +1,29 @@
-image_path = '/data2/datasets/kaggle-dog-vs-cat/train'
-ouput_path = '/data2/datasets/kaggle-dog-vs-cat/tmp'
-
 import os
+import sys
+import argparse
+
+
+parser = argparse.ArgumentParser(description='Script')
+parser.add_argument('--image-path', default='', type=str)
+parser.add_argument('--output-path', default='', type=str)
+args = parser.parse_args()
+
+
+if args.image_path:
+    image_path = args.image_path
+else:
+    sys.exit(0)
+
+if args.output_path:
+    output_path = args.output_path
+else:
+    output_path = os.path.join(image_path, '/../tmp')
+
+
 from glob import glob
 import shutil
 import random
 
-random.seed(1234)
 
 my_files = {}
 for filename in glob(image_path + '/*.jpg'):
@@ -18,27 +35,26 @@ for filename in glob(image_path + '/*.jpg'):
         temp.append(filename)
 
 
-# random.sample 1000 cat jpgs and 1000 dog jpgs for train
-tmp_train = os.path.join(ouput_path, 'train')
+# random.sample 100, and 80 to train, 20 to val
+tmp_train = os.path.join(output_path, 'train')
 if os.path.exists(tmp_train) and os.path.isdir(tmp_train):
     shutil.rmtree(tmp_train)
 
-os.makedirs(tmp_train)
-for key, val in my_files.items():
-    to_path = os.path.join(tmp_train, key)
-    os.makedirs(to_path)
-    for filename in random.sample(val, 1000):
-        shutil.copy(filename, to_path)
 
-
-# random.sample 400 cat jpgs and 400 dog jpgs for val
-tmp_val = os.path.join(ouput_path, 'val')
+tmp_val = os.path.join(output_path, 'val')
 if os.path.exists(tmp_val) and os.path.isdir(tmp_val):
     shutil.rmtree(tmp_val)
 
-os.makedirs(tmp_val)
+
 for key, val in my_files.items():
+    val = random.sample(val, min(1000, len(val)))
+
+    to_path = os.path.join(tmp_train, key)
+    os.makedirs(to_path)
+    for filename in val[:int(len(val) * 0.8)]:
+        shutil.copy(filename, to_path)
+
     to_path = os.path.join(tmp_val, key)
     os.makedirs(to_path)
-    for filename in random.sample(val, 400):
+    for filename in val[int(len(val) * 0.8):]:
         shutil.copy(filename, to_path)
