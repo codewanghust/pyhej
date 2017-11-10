@@ -175,5 +175,5 @@ parser.add_argument('--output', default='/data2/tmps', type=str)
 args = parser.parse_args(['/data2/tmps/1109_not_medical_c10/img/tmp', '--num-class', '10',
     '-j', '8', '--cuda', '--epochs', '900'])
 print(args)
-todo(args, topk=(1, 1))
+todo(args, topk=(1, 5))
 '''

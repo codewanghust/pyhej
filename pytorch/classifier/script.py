@@ -26,8 +26,9 @@ import random
 
 
 my_files = {}
-for filename in glob(image_path + '/*.jpg'):
-    class_name = filename.split('/')[-1].split('.')[-3]
+for filename in glob(image_path + '/*/*.jpg'):
+    #class_name = filename.split('/')[-1].split('.')[-3]
+    class_name = filename.split('/')[-2]
     temp = my_files.get(class_name)
     if temp is None:
         my_files[class_name] = [filename]
