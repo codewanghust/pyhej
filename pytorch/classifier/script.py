@@ -17,7 +17,7 @@ else:
 if args.output_path:
     output_path = args.output_path
 else:
-    output_path = os.path.join(image_path, '/../tmp')
+    output_path = os.path.join(image_path, '../tmp')
 
 
 from glob import glob
@@ -25,15 +25,24 @@ import shutil
 import random
 
 
-my_files = {}
-for filename in glob(image_path + '/*/*.jpg'):
+files = []
+files.extend(glob(image_path + '/*/*.png'))
+files.extend(glob(image_path + '/*/*.jpg'))
+files.extend(glob(image_path + '/*/*.jpeg'))
+
+
+groups = {}
+for filename in files:
     #class_name = filename.split('/')[-1].split('.')[-3]
     class_name = filename.split('/')[-2]
-    temp = my_files.get(class_name)
+    temp = groups.get(class_name)
     if temp is None:
-        my_files[class_name] = [filename]
+        groups[class_name] = [filename]
     else:
         temp.append(filename)
+
+
+print('input {}, output {}, files {}, groups {}'.format(image_path, output_path, len(files), len(groups)))
 
 
 # random.sample 100, and 80 to train, 20 to val
@@ -47,7 +56,7 @@ if os.path.exists(tmp_val) and os.path.isdir(tmp_val):
     shutil.rmtree(tmp_val)
 
 
-for key, val in my_files.items():
+for key, val in groups.items():
     val = random.sample(val, min(1000, len(val)))
 
     to_path = os.path.join(tmp_train, key)
