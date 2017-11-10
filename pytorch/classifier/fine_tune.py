@@ -111,6 +111,7 @@ def todo(args, topk=(1, 5)):
 
     train_dataset = datasets.ImageFolder(traindir,
         transforms.Compose([
+            transforms.Scale(256),
             transforms.RandomSizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
