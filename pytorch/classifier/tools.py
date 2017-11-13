@@ -1,7 +1,92 @@
+'''https://github.com/pytorch/examples/tree/master/imagenet
+'''
 import os
 import time
-import torch
 import shutil
+import torch
+import torch.utils.data as data
+import torchvision.transforms as transforms
+from PIL import Image
+
+
+IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm']
+
+
+def is_image_file(filename):
+    '''Checks if a file is an image.
+    Args:
+        filename (string): path to a file
+    Returns:
+        bool: True if the filename ends with a known image extension
+    '''
+    filename_lower = filename.lower()
+    return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
+
+
+class ImageFolder(data.Dataset):
+    def __init__(self, root, transform=None, target_transform=None):
+        root = os.path.expanduser(root)
+
+        classes = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))]
+        classes.sort()
+        class_to_idx = {classes[i]: i for i in range(len(classes))}
+
+        images = []
+        for target in classes:
+            d = os.path.join(root, target)
+            for dirpath, _, filenames in sorted(os.walk(d)):
+                for filename in sorted(filenames):
+                    if is_image_file(filename):
+                        item = (os.path.join(dirpath, filename), class_to_idx[target])
+                        images.append(item)
+
+        self.root = root
+        self.classes = classes
+        self.class_to_idx = class_to_idx
+        self.images = images
+        if transform is None:
+            self.transform = transforms.Compose([transforms.ToTensor(),])
+        else:
+            self.transform = transform
+        self.target_transform = target_transform
+
+    def __getitem__(self, index):
+        '''
+        Args:
+            index (int): Index
+        Returns:
+            tuple: (image, target) where target is class_index of the target class.
+        '''
+        filepath, target = self.images[index]
+        with open(filepath, 'rb') as f:
+            with Image.open(f) as img:
+                input = img.convert('RGB')
+        if self.transform is not None:
+            input = self.transform(input)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+        return input, target
+
+    def __len__(self):
+        return len(self.images)
+
+
+def get_mean_and_std(dataset):
+    '''Compute the mean and std value of dataset.
+    dataset = ImageFolder('/your/image/path/')
+    get_mean_and_std(dataset)
+    '''
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=2)
+    mean = torch.zeros(3)
+    std = torch.zeros(3)
+    print('==> Computing mean and std..')
+    for inputs, targets in dataloader:
+        for i in range(3):
+            mean[i] += inputs[:,i,:,:].mean()
+            std[i] += inputs[:,i,:,:].std()
+    mean.div_(len(dataset))
+    std.div_(len(dataset))
+    return mean, std
 
 
 class AverageMeter(object):
