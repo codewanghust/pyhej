@@ -82,7 +82,7 @@ def todo(args):
 
     print('==> Preparing data..')
     transform_train = transforms.Compose([
-        transforms.Scale(32),
+        transforms.Scale((32, 32)),
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -91,7 +91,7 @@ def todo(args):
     ])
 
     transform_test = transforms.Compose([
-        transforms.Scale(32),
+        transforms.Scale((32, 32)),
         transforms.ToTensor(),
         #transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
