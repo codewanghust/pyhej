@@ -97,12 +97,12 @@ def todo(args):
 
     traindir, valdir = os.path.join(args.data, 'train'), os.path.join(args.data, 'val')
 
-    trainset = torchvision.datasets.CIFAR10(root=args.data, train=True, download=True, transform=transform_train)
-    #trainset = datasets.ImageFolder(traindir, transform_train)
+    #trainset = torchvision.datasets.CIFAR10(root=args.data, train=True, download=True, transform=transform_train)
+    trainset = datasets.ImageFolder(traindir, transform_train)
     trainloader = torch.utils.data.DataLoader(trainset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
 
-    testset = torchvision.datasets.CIFAR10(root=args.data, train=False, download=True, transform=transform_test)
-    #testset = datasets.ImageFolder(valdir, transform_test)
+    #testset = torchvision.datasets.CIFAR10(root=args.data, train=False, download=True, transform=transform_test)
+    testset = datasets.ImageFolder(valdir, transform_test)
     testloader = torch.utils.data.DataLoader(testset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
     # Model
