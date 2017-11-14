@@ -86,13 +86,15 @@ def todo(args):
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        #transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
     ])
 
     transform_test = transforms.Compose([
         transforms.Scale(32),
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        #transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
     ])
 
     traindir, valdir = os.path.join(args.data, 'train'), os.path.join(args.data, 'val')
@@ -155,7 +157,7 @@ parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', default='', type=str, help='resume from checkpoint')
 parser.add_argument('--output', default='/tmp', type=str)
 args = parser.parse_args(['/data2/tmps/cifar-10', '--num-class', '10',
-    '-j', '8', '--cuda', '-b', '128', '--epochs', '2', '--output', '/data2/tmps/cifar-10'])
+    '-j', '8', '--cuda', '-b', '32', '--epochs', '2', '--output', '/data2/tmps/cifar-10'])
 print(args)
 from pyhej.pytorch.classifier.dpn_lab import todo
 todo(args)
