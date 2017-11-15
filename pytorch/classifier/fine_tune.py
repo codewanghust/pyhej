@@ -39,7 +39,7 @@ def train(train_loader, model, criterion, optimizer, epoch, topk=(1, 5), print_f
     model.train()
 
     end = time.time()
-    for i, (input, target) in enumerate(train_loader):
+    for i, (input, target) in enumerate(train_loader, 1):
         # measure data loading time
         data_time.update(time.time() - end)
 
@@ -67,10 +67,10 @@ def train(train_loader, model, criterion, optimizer, epoch, topk=(1, 5), print_f
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % print_freq == 0:
+        if i % print_freq == 0 or i == len(train_loader):
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\n\t'
+                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\n'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                   'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
@@ -109,15 +109,15 @@ def todo(args, topk=(1, 5)):
 
     # Data loading code
     traindir, valdir = os.path.join(args.data, 'train'), os.path.join(args.data, 'val')
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     train_dataset = datasets.ImageFolder(traindir,
         transforms.Compose([
-            transforms.Scale(256),
+            transforms.Scale((256, 256)),
             transforms.RandomSizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            normalize,
+            #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
         ]))
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size,
@@ -125,16 +125,17 @@ def todo(args, topk=(1, 5)):
 
     val_dataset = datasets.ImageFolder(valdir,
         transforms.Compose([
-            transforms.Scale(256),
+            transforms.Scale((256, 256)),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
-            normalize,
+            #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
         ]))
 
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size,
         shuffle=False, num_workers=args.workers, pin_memory=True)
 
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in range(args.start_epoch, args.start_epoch+args.epochs):
         adjust_learning_rate(optimizer, epoch, args.lr)
 
         # train for one epoch
@@ -158,7 +159,6 @@ def todo(args, topk=(1, 5)):
 '''
 ## train
 import argparse
-from pyhej.pytorch.classifier.fine_tune import todo
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', help='path to dataset')
 parser.add_argument('--num-class', default=2, type=int)
@@ -174,10 +174,11 @@ parser.add_argument('--momentum', default=0.9, type=float)
 parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float)
 parser.add_argument('--resume', default='', type=str)
 parser.add_argument('--print-freq', '-p', default=1000, type=int)
-parser.add_argument('--output', default='/data2/tmps', type=str)
-args = parser.parse_args(['/data2/tmps/1109_not_medical_c10/tmp', '--num-class', '10',
-    '-j', '8', '--cuda', '--epochs', '900'])
+parser.add_argument('--output', default='/tmp', type=str)
+args = parser.parse_args(['/data2/tmps/cifar-10/tmp', '--num-class', '10',
+    '-j', '8', '--cuda', '-b', '32', '--epochs', '2', '--output', '/data2/tmps/cifar-10'])
 print(args)
+from pyhej.pytorch.classifier.fine_tune import todo
 todo(args, topk=(1, 5))
 
 
@@ -185,32 +186,25 @@ todo(args, topk=(1, 5))
 from PIL import Image
 import torchvision.transforms as transforms
 
-
 def pil_loader(path):
     with open(path, 'rb') as f:
         with Image.open(f) as img:
             return img.convert('RGB')
 
-
-normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
-
 data_transforms = transforms.Compose([
-    transforms.Scale(256),
+    transforms.Scale((256, 256)),
     transforms.CenterCrop(224),
     transforms.ToTensor(),
-    normalize,
+    #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+    transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
 ])
-
 
 img = pil_loader('/data2/tmps/1109_not_medical_c10/tmp/val/c1/img2062.jpeg')
 img = data_transforms(img)
 input = img.unsqueeze(0)
 
-
 import torch
 from pyhej.pytorch.classifier.fine_tune import get_model
-
 
 model = get_model('resnet18', False, True, 10)
 checkpoint = torch.load('/data2/tmps/model_best.pth.tar')
