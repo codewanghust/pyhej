@@ -194,4 +194,6 @@ net = checkpoint['net']
 inputs_var = torch.autograd.Variable(inputs, volatile=True)
 outputs = model(inputs_var)
 outputs.topk(2, 1)
+# softmax = nn.Softmax()
+# softmax(outputs)
 '''
