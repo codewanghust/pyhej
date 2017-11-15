@@ -170,8 +170,8 @@ def validate(val_loader, model, criterion, topk=(1, 5), print_freq=1000):
         end = time.time()
 
         if i % print_freq == 0 or i == len(val_loader):
-            print('Test: [{0}/{1}]\t'
-                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\n'
+            print('Test : [{0}/{1}]\t'
+                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\n\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                   'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(

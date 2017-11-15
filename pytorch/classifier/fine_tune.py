@@ -28,7 +28,7 @@ def get_model(name, pretrained, cuda=True, num_class=2):
     return model
 
 
-def train(train_loader, model, criterion, optimizer, epoch, topk=(1, 5), print_freq=1000):
+def train(train_loader, model, criterion, optimizer, topk=(1, 5), print_freq=1000):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -68,14 +68,13 @@ def train(train_loader, model, criterion, optimizer, epoch, topk=(1, 5), print_f
         end = time.time()
 
         if i % print_freq == 0 or i == len(train_loader):
-            print('Epoch: [{0}][{1}/{2}]\t'
+            print('Train: [{0}/{1}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\n'
+                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\n\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                   'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                   epoch, i, len(train_loader), batch_time=batch_time,
-                   data_time=data_time, loss=losses, top1=top1, top5=top5))
+                   i, len(train_loader), batch_time=batch_time, data_time=data_time, loss=losses, top1=top1, top5=top5))
 
 
 def todo(args, topk=(1, 5)):
@@ -137,9 +136,10 @@ def todo(args, topk=(1, 5)):
 
     for epoch in range(args.start_epoch, args.start_epoch+args.epochs):
         adjust_learning_rate(optimizer, epoch, args.lr)
+        print('\nEpoch: [{0}]'.format(epoch))
 
-        # train for one epoch
-        train(train_loader, model, criterion, optimizer, epoch, topk, args.print_freq)
+        # training
+        train(train_loader, model, criterion, optimizer, topk, args.print_freq)
 
         # evaluate on validation set
         prec1 = validate(val_loader, model, criterion, topk, args.print_freq)
