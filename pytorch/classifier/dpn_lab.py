@@ -161,4 +161,37 @@ args = parser.parse_args(['/data2/tmps/cifar-10', '--num-class', '10',
 print(args)
 from pyhej.pytorch.classifier.dpn_lab import todo
 todo(args)
+
+
+## test
+from PIL import Image
+import torchvision.transforms as transforms
+
+def pil_loader(path):
+    with open(path, 'rb') as f:
+        with Image.open(f) as img:
+            return img.convert('RGB')
+
+transform_test = transforms.Compose([
+    transforms.Scale((32, 32)),
+    transforms.ToTensor(),
+    #transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
+])
+
+img = pil_loader('/data2/tmps/1109_not_medical_c10/tmp/val/c1/img2062.jpeg')
+img = transform_test(img)
+inputs = img.unsqueeze(0)
+
+import torch
+import torch.nn as nn
+
+checkpoint = torch.load('/data2/tmps/1114_not_medical_c10/dpn/model_best.pth.tar')
+net = checkpoint['net']
+# if use cuda
+# net = nn.DataParallel(net).cuda()
+
+inputs_var = torch.autograd.Variable(inputs, volatile=True)
+outputs = model(inputs_var)
+outputs.topk(2, 1)
 '''

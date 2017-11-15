@@ -201,7 +201,7 @@ data_transforms = transforms.Compose([
 
 img = pil_loader('/data2/tmps/1109_not_medical_c10/tmp/val/c1/img2062.jpeg')
 img = data_transforms(img)
-input = img.unsqueeze(0)
+inputs = img.unsqueeze(0)
 
 import torch
 from pyhej.pytorch.classifier.fine_tune import get_model
@@ -210,7 +210,7 @@ model = get_model('resnet18', False, True, 10)
 checkpoint = torch.load('/data2/tmps/model_best.pth.tar')
 model.load_state_dict(checkpoint['state_dict'])
 
-input_var = torch.autograd.Variable(input, volatile=True)
-output = model(input_var)
-output.topk(2, 1)
+inputs_var = torch.autograd.Variable(inputs, volatile=True)
+outputs = model(inputs_var)
+outputs.topk(2, 1)
 '''
