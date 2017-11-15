@@ -111,8 +111,10 @@ def todo(args, topk=(1, 5)):
 
     train_dataset = datasets.ImageFolder(traindir,
         transforms.Compose([
-            transforms.Scale((256, 256)),
-            transforms.RandomSizedCrop(224),
+            #transforms.Scale((256, 256)),
+            #transforms.RandomResizedCrop(224),
+            transforms.Scale((224, 224)),
+            transforms.RandomCrop(224, padding=28),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
@@ -124,8 +126,8 @@ def todo(args, topk=(1, 5)):
 
     val_dataset = datasets.ImageFolder(valdir,
         transforms.Compose([
-            transforms.Scale((256, 256)),
-            transforms.CenterCrop(224),
+            transforms.Scale((224, 224)),
+            #transforms.CenterCrop(224),
             transforms.ToTensor(),
             #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
             transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
@@ -192,8 +194,8 @@ def pil_loader(path):
             return img.convert('RGB')
 
 data_transforms = transforms.Compose([
-    transforms.Scale((256, 256)),
-    transforms.CenterCrop(224),
+    transforms.Scale((224, 224)),
+    #transforms.CenterCrop(224),
     transforms.ToTensor(),
     #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
