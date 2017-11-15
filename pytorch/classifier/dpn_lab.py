@@ -188,9 +188,17 @@ import torch.nn as nn
 
 checkpoint = torch.load('/data2/tmps/1114_not_medical_c10/dpn/model_best.pth.tar')
 net = checkpoint['net']
-# if use cuda
-# net = nn.DataParallel(net).cuda()
 
+# if use cuda
+model = nn.DataParallel(net).cuda()
+inputs_var = torch.autograd.Variable(inputs.cuda(), volatile=True)
+outputs = model(inputs_var)
+outputs.topk(2, 1)
+# softmax = nn.Softmax()
+# softmax(outputs)
+
+# if use cpu
+model = net.cpu()
 inputs_var = torch.autograd.Variable(inputs, volatile=True)
 outputs = model(inputs_var)
 outputs.topk(2, 1)
