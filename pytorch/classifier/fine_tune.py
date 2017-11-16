@@ -185,6 +185,8 @@ todo(args, topk=(1, 5))
 
 
 ## test
+import torch
+from pyhej.pytorch.classifier.fine_tune import get_model
 from PIL import Image
 import torchvision.transforms as transforms
 
@@ -195,26 +197,23 @@ def pil_loader(path):
 
 data_transforms = transforms.Compose([
     transforms.Scale((224, 224)),
-    #transforms.CenterCrop(224),
     transforms.ToTensor(),
-    #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
 ])
 
-img = pil_loader('/data2/tmps/1109_not_medical_c10/tmp/val/c1/img2062.jpeg')
+img = pil_loader('/data2/tmps/1114_not_medical_c10/tmp/val/c4/img2622.jpeg')
 img = data_transforms(img)
 inputs = img.unsqueeze(0)
-
-import torch
-from pyhej.pytorch.classifier.fine_tune import get_model
-
-model = get_model('resnet18', False, True, 10)
-checkpoint = torch.load('/data2/tmps/model_best.pth.tar')
-model.load_state_dict(checkpoint['state_dict'])
-
 inputs_var = torch.autograd.Variable(inputs, volatile=True)
+
+model = get_model('resnet18', False, True, 6)
+checkpoint = torch.load('/data2/tmps/1114_not_medical_c10/resnet18-1115/model_best.pth.tar')
+model.load_state_dict(checkpoint['state_dict'])
+model.eval()
+
 outputs = model(inputs_var)
 outputs.topk(2, 1)
+# import torch.nn as nn
 # softmax = nn.Softmax()
-# softmax(outputs)
+# softmax(outputs).topk(2, 1)
 '''

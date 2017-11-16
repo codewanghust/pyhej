@@ -164,6 +164,8 @@ todo(args)
 
 
 ## test
+import torch
+import torch.nn as nn
 from PIL import Image
 import torchvision.transforms as transforms
 
@@ -172,36 +174,28 @@ def pil_loader(path):
         with Image.open(f) as img:
             return img.convert('RGB')
 
-transform_test = transforms.Compose([
+data_transforms = transforms.Compose([
     transforms.Scale((32, 32)),
     transforms.ToTensor(),
-    #transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     transforms.Normalize((0.5065, 0.5091, 0.4707), (0.2226, 0.2189, 0.2175)),
 ])
 
-img = pil_loader('/data2/tmps/1109_not_medical_c10/tmp/val/c1/img2062.jpeg')
-img = transform_test(img)
+img = pil_loader('/data2/tmps/1114_not_medical_c10/tmp/val/c4/img2622.jpeg')
+img = data_transforms(img)
 inputs = img.unsqueeze(0)
+inputs_var = torch.autograd.Variable(inputs, volatile=True)
 
-import torch
-import torch.nn as nn
-
-checkpoint = torch.load('/data2/tmps/1114_not_medical_c10/dpn/model_best.pth.tar')
+checkpoint = torch.load('/data2/tmps/1114_not_medical_c10/dpn92-1115/model_best.pth.tar')
 net = checkpoint['net']
-
 # if use cuda
 model = nn.DataParallel(net).cuda()
-inputs_var = torch.autograd.Variable(inputs.cuda(), volatile=True)
-outputs = model(inputs_var)
-outputs.topk(2, 1)
-# softmax = nn.Softmax()
-# softmax(outputs)
-
 # if use cpu
 model = net.cpu()
-inputs_var = torch.autograd.Variable(inputs, volatile=True)
+model.eval()
+
 outputs = model(inputs_var)
 outputs.topk(2, 1)
+# import torch.nn as nn
 # softmax = nn.Softmax()
-# softmax(outputs)
+# softmax(outputs).topk(2, 1)
 '''

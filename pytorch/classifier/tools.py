@@ -71,6 +71,18 @@ class ImageFolder(data.Dataset):
         return len(self.images)
 
 
+def predict(model, inputs, topk=1, softmax=None):
+    '''Predict possible k categories
+    import torch.nn as nn
+    softmax = nn.Softmax()
+    '''
+    inputs_var = torch.autograd.Variable(inputs, volatile=True)
+    outputs = model(inputs_var)
+    if softmax:
+        outputs = softmax(outputs)
+    return outputs.topk(topk, 1)
+
+
 def get_mean_and_std(dataset):
     '''Compute the mean and std value of dataset.
     dataset = ImageFolder('/your/image/path/')
