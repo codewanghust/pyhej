@@ -5,7 +5,7 @@
 import cv2
 
 
-def eval_of_laplacian(image_path):
+def eval_of_laplacian(image_path, threshold=100):
     '''http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_gradients/py_gradients.html
     http://python.jobbole.com/83702/
     这种方法凑效的原因就在于拉普拉斯算子定义本身:
@@ -16,11 +16,9 @@ def eval_of_laplacian(image_path):
       如果图片具有较小方差,那么它就有较窄的频响范围,意味着图片中的边缘数量很少
       正如我们所知道的,图片越模糊,其边缘就越少
     '''
-    img = cv2.imread(image_path)
-    if img.ndim == 3:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.imread(image_path, 0)
     res = cv2.Laplacian(img, cv2.CV_64F).var()
-    return res
+    return res>threshold, res
 
 
 def eval_of_reblur(image_path, ksize=5):
@@ -42,14 +40,16 @@ def eval_of_reblur(image_path, ksize=5):
 def eval_of_sobel(image_path, ksize=5):
     '''http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_gradients/py_gradients.html
     '''
-    img = cv2.imread(image_path, 0)
+    img = cv2.imread(image_path)
+    if img.ndim == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=ksize)
     sobely = cv2.Sobel(img, cv2.CV_64F, 0, 1, ksize=ksize)
     res = (sobelx + sobely).var()
     #from matplotlib import pyplot as plt
     #plt.imshow(sobelx + sobely, cmap='gray')
     #plt.show()
-    return res/4
+    return res
 
 
 '''
