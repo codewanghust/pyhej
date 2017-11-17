@@ -3,9 +3,10 @@
 import os
 import time
 import shutil
+import codecs
 import torch
+import torch.nn as nn
 import torch.utils.data as data
-import torchvision.transforms as transforms
 from PIL import Image
 
 
@@ -25,29 +26,15 @@ def is_image_file(filename):
 
 class ImageFolder(data.Dataset):
     def __init__(self, root, transform=None, target_transform=None):
-        root = os.path.expanduser(root)
-
-        classes = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))]
-        classes.sort()
-        class_to_idx = {classes[i]: i for i in range(len(classes))}
-
         images = []
-        for target in classes:
-            d = os.path.join(root, target)
-            for dirpath, _, filenames in sorted(os.walk(d)):
-                for filename in sorted(filenames):
+        for i, target in enumerate(sorted(os.listdir(root))):
+            for dirpath, _, filenames in sorted(os.walk(os.path.join(root, target))):
+                for filename in filenames:
                     if is_image_file(filename):
-                        item = (os.path.join(dirpath, filename), class_to_idx[target])
-                        images.append(item)
+                        images.append((os.path.join(dirpath, filename), i))
 
-        self.root = root
-        self.classes = classes
-        self.class_to_idx = class_to_idx
         self.images = images
-        if transform is None:
-            self.transform = transforms.Compose([transforms.ToTensor(),])
-        else:
-            self.transform = transform
+        self.transform = transform
         self.target_transform = target_transform
 
     def __getitem__(self, index):
@@ -71,8 +58,43 @@ class ImageFolder(data.Dataset):
         return len(self.images)
 
 
-def predict(model, inputs, topk=1, softmax=None):
-    '''Predict possible k categories
+class ImageFile(data.Dataset):
+    def __init__(self, filename, transform=None, target_transform=None):
+        images = []
+        with codecs.open(filename, 'r', 'utf-8') as reader:
+            for line in reader.readlines():
+                if line.startswith('#'):
+                    continue
+                filepath, target = line.strip().split(',')
+                images.append((filepath, target))
+
+        self.images = images
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __getitem__(self, index):
+        '''
+        Args:
+            index (int): Index
+        Returns:
+            tuple: (image, target) where target is class_index of the target class.
+        '''
+        filepath, target = self.images[index]
+        with open(filepath, 'rb') as f:
+            with Image.open(f) as img:
+                input = img.convert('RGB')
+        if self.transform is not None:
+            input = self.transform(input)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+        return input, target
+
+    def __len__(self):
+        return len(self.images)
+
+
+def test(model, inputs, topk=1, softmax=None):
+    '''test possible k categories
     import torch.nn as nn
     softmax = nn.Softmax()
     '''
@@ -81,6 +103,24 @@ def predict(model, inputs, topk=1, softmax=None):
     if softmax:
         outputs = softmax(outputs)
     return outputs.topk(topk, 1)
+
+
+def eval(model, inputs, targets, topk=(1,), softmax=None):
+    '''evaluate model in topk
+    import torch.nn as nn
+    softmax = nn.Softmax()
+    '''
+    score, pred = test(model, inputs, max(topk), softmax)
+    score = score.t()
+    pred = pred.t()
+    correct = pred.eq(targets.view(1, -1).expand_as(pred)).float()
+
+    res = []
+    for k in topk:
+        score_k = score[:k].sum(0, keepdim=True)
+        correct_k = correct[:k].sum(0, keepdim=True)
+        res.append((score_k, correct_k))
+    return res
 
 
 def get_mean_and_std(dataset):

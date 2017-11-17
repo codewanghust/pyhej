@@ -48,6 +48,7 @@ def train(train_loader, model, criterion, optimizer, topk=(1, 5), print_freq=100
         target_var = torch.autograd.Variable(target)
 
         # compute output
+        optimizer.zero_grad()
         output = model(input_var)
 
         # measure accuracy and record loss
@@ -59,7 +60,6 @@ def train(train_loader, model, criterion, optimizer, topk=(1, 5), print_freq=100
         top5.update(prec5[0], input.size(0))
 
         # compute gradient and do SGD step
-        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 

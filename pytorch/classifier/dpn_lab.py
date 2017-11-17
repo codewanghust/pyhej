@@ -25,10 +25,9 @@ def train(epoch, net, trainloader, use_cuda, optimizer, criterion):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda()
         inputs, targets = Variable(inputs), Variable(targets)
+        optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, targets)
-
-        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
