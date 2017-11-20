@@ -105,21 +105,21 @@ def test(model, inputs, topk=1, softmax=None):
     return outputs.topk(topk, 1)
 
 
-def eval(model, inputs, targets, topk=(1,), softmax=None):
-    '''evaluate model in topk
+def eval(model, inputs, targets, topks=(1,), softmax=None):
+    '''evaluate model in topks
     import torch.nn as nn
     softmax = nn.Softmax()
     '''
-    score, pred = test(model, inputs, max(topk), softmax)
+    score, pred = test(model, inputs, max(topks), softmax)
     score = score.t()
     pred = pred.t()
     correct = pred.eq(targets.view(1, -1).expand_as(pred)).float()
 
     res = []
-    for k in topk:
+    for k in topks:
         score_k = score[:k].sum(0, keepdim=True)
         correct_k = correct[:k].sum(0, keepdim=True)
-        res.append((score_k, correct_k))
+        res.append((score_k[0].tolist(), correct_k[0].tolist()))
     return res
 
 

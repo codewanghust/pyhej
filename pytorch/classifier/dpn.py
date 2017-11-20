@@ -1,5 +1,7 @@
 '''https://github.com/kuangliu/pytorch-cifar/blob/master/models/dpn.py
-Dual Path Networks in PyTorch.'''
+Dual Path Networks in PyTorch.
+inputs: 3 x 32 x 32
+'''
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
