@@ -207,8 +207,8 @@ def train(train_loader, model, criterion, optimizer, topks=(1, 5), use_cuda=True
             train_accs[k].update(acc[0], inputs.size(0))
 
     train_accs = [(k, acc.avg) for k, acc in zip(topks, train_accs)]
-    text = ', '.join(['Acc@{}: {.4f}'.format(k, acc) for k, acc in train_accs])
-    print('  Loss: {.3f}, {}'.format(train_loss.avg, text))
+    text = ', '.join(['Acc@{}: {:.4f}'.format(k, acc) for k, acc in train_accs])
+    print('  Loss: {:.3f}, {}'.format(train_loss.avg, text))
     return train_accs
 
 
@@ -234,8 +234,8 @@ def validate(val_loader, model, criterion, topks=(1, 5), use_cuda=True):
             val_accs[k].update(acc[0], inputs.size(0))
 
     val_accs = [(k, acc.avg) for k, acc in zip(topks, val_accs)]
-    text = ', '.join(['Acc@{}: {.4f}'.format(k, acc) for k, acc in val_accs])
-    print('  Loss: {.3f}, {}'.format(val_loss.avg, text))
+    text = ', '.join(['Acc@{}: {:.4f}'.format(k, acc) for k, acc in val_accs])
+    print('  Loss: {:.3f}, {}'.format(val_loss.avg, text))
     return val_accs
 
 
