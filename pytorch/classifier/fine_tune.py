@@ -84,7 +84,7 @@ val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=cfg.batch_size,
 
 
 for epoch in range(cfg.epochs):
-    print('{} | Epoch: {}+{}'.format(time.strftime('%y-%m-%d %H:%M:%S'), cfg.start_epoch, epoch))
+    print('{} | Epoch: {} + {}'.format(time.strftime('%y-%m-%d %H:%M:%S'), cfg.start_epoch, epoch))
     adjust_learning_rate(optimizer, epoch, cfg.lr)
     # train for one epoch
     train(train_loader, model, criterion, optimizer, cfg.topks, cfg.use_cuda)
