@@ -201,7 +201,7 @@ def train(train_loader, model, criterion, optimizer, topks=(1, 5), use_cuda=True
         loss.backward()
         optimizer.step()
 
-        accs = accuracy(outputs.data, targets, topks)
+        accs = accuracy(outputs.data, targets.data, topks)
         train_loss.update(loss.data[0], inputs.size(0))
         for k, acc in enumerate(accs):
             train_accs[k].update(acc[0], inputs.size(0))
@@ -228,7 +228,7 @@ def validate(val_loader, model, criterion, topks=(1, 5), use_cuda=True):
         outputs = model(inputs)
         loss = criterion(outputs, targets)
 
-        accs = accuracy(outputs.data, targets, topks)
+        accs = accuracy(outputs.data, targets.data, topks)
         val_loss.update(loss.data[0], inputs.size(0))
         for k, acc in enumerate(accs):
             val_accs[k].update(acc[0], inputs.size(0))
@@ -246,4 +246,3 @@ def save_checkpoint(state, is_best, file_path='tmps'):
     torch.save(state, file_name)
     if is_best:
         shutil.copyfile(file_name, os.path.join(file_path, 'model_best.pth.tar'))
-

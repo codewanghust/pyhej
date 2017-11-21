@@ -18,7 +18,7 @@ cfg.data = '/data2/tmps/1114_not_medical_c10/tmp'
 cfg.use_cuda = True
 cfg.model_name = 'resnet50'
 cfg.pretrained = True
-cfg.num_classes = 100
+cfg.num_classes = 1000
 
 cfg.lr = 0.1
 cfg.momentum = 0.9
@@ -100,4 +100,3 @@ for epoch in range(cfg.epochs):
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict()
     }, is_best, cfg.output)
-
