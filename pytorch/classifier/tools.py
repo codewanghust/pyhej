@@ -108,7 +108,7 @@ def get_mean_and_std(dataset, num_workers=4):
     return mean, std
 
 
-def test(model, inputs, topk=1, softmax=None):
+def test(model, inputs, maxk=1, softmax=None):
     '''test possible k categories
     import torch.nn as nn
     softmax = nn.Softmax()
@@ -117,7 +117,7 @@ def test(model, inputs, topk=1, softmax=None):
     outputs = model(inputs_var)
     if softmax:
         outputs = softmax(outputs)
-    return outputs.topk(topk, 1)
+    return outputs.topk(maxk, 1)
 
 
 def eval(model, inputs, targets, topks=(1,), softmax=None):
