@@ -1,12 +1,9 @@
 '''https://github.com/pytorch/examples/tree/master/imagenet
 '''
 import os
-import time
 import shutil
 import codecs
 import torch
-import torch.nn as nn
-import torch.utils.data as data
 from PIL import Image
 
 
@@ -24,7 +21,7 @@ def is_image_file(filename):
     return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
 
 
-class ImageFolder(data.Dataset):
+class ImageFolder(torch.utils.data.Dataset):
     def __init__(self, root, transform=None, target_transform=None):
         images = []
         for i, target in enumerate(sorted(os.listdir(root))):
@@ -58,7 +55,7 @@ class ImageFolder(data.Dataset):
         return len(self.images)
 
 
-class ImageFile(data.Dataset):
+class ImageFile(torch.utils.data.Dataset):
     def __init__(self, filename, transform=None, target_transform=None):
         images = []
         with codecs.open(filename, 'r', 'utf-8') as reader:
@@ -93,6 +90,24 @@ class ImageFile(data.Dataset):
         return len(self.images)
 
 
+def get_mean_and_std(dataset, num_workers=4):
+    '''Compute the mean and std value of dataset.
+    dataset = ImageFolder('/your/image/path/')
+    get_mean_and_std(dataset)
+    '''
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, num_workers=num_workers)
+    mean = torch.zeros(3)
+    std = torch.zeros(3)
+    print('==> Computing mean and std..')
+    for inputs, targets in dataloader:
+        for i in range(3):
+            mean[i] += inputs[:,i,:,:].mean()
+            std[i] += inputs[:,i,:,:].std()
+    mean.div_(len(dataset))
+    std.div_(len(dataset))
+    return mean, std
+
+
 def test(model, inputs, topk=1, softmax=None):
     '''test possible k categories
     import torch.nn as nn
@@ -123,34 +138,17 @@ def eval(model, inputs, targets, topks=(1,), softmax=None):
     return res
 
 
-def get_mean_and_std(dataset):
-    '''Compute the mean and std value of dataset.
-    dataset = ImageFolder('/your/image/path/')
-    get_mean_and_std(dataset)
-    '''
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True, num_workers=2)
-    mean = torch.zeros(3)
-    std = torch.zeros(3)
-    print('==> Computing mean and std..')
-    for inputs, targets in dataloader:
-        for i in range(3):
-            mean[i] += inputs[:,i,:,:].mean()
-            std[i] += inputs[:,i,:,:].std()
-    mean.div_(len(dataset))
-    std.div_(len(dataset))
-    return mean, std
-
-
 class AverageMeter(object):
-    '''Computes and stores the average and current value'''
+    '''Computes and stores the average and current value
+    '''
     def __init__(self):
         self.reset()
 
     def reset(self):
         self.val = 0
-        self.avg = 0
         self.sum = 0
         self.count = 0
+        self.avg = 0
 
     def update(self, val, n=1):
         self.val = val
@@ -160,29 +158,88 @@ class AverageMeter(object):
 
 
 def adjust_learning_rate(optimizer, epoch, init_lr):
-    '''Sets the learning rate to the initial LR decayed by 10 every 30 epochs'''
+    '''Sets the learning rate to the initial LR decayed by 10 every 30 epochs
+    '''
     lr = init_lr * (0.1 ** (epoch // 30))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
 
-def accuracy(output, target, topk=(1, 5)):
-    '''Computes the precision@k for the specified values of k'''
-    maxk = max(topk)
-    batch_size = target.size(0)
+def accuracy(outputs, targets, topks=(1, 5)):
+    '''Computes the precision@k for the specified values of k
+    '''
+    maxk = max(topks)
+    batch_size = targets.size(0)
 
-    _, pred = output.topk(maxk, 1, True, True)
+    _, pred = outputs.topk(maxk, 1)
     pred = pred.t()
-    correct = pred.eq(target.view(1, -1).expand_as(pred))
+    correct = pred.eq(targets.view(1, -1).expand_as(pred)).float()
 
-    res = []
-    for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
-        res.append(correct_k.mul_(100.0 / batch_size))
-    return res
+    accs = []
+    for k in topks:
+        correct_k = correct[:k].view(-1).sum(0, keepdim=True)
+        accs.append(correct_k.mul_(100.0 / batch_size))
+    return accs
 
 
-def save_checkpoint(state, is_best, file_path='tmp'):
+def train(train_loader, model, criterion, optimizer, topks=(1, 5), use_cuda=True):
+    train_loss = AverageMeter()
+    train_accs = [AverageMeter() for _ in topks]
+
+    # switch to train mode
+    model.train()
+
+    for i, (inputs, targets) in enumerate(train_loader, 1):
+        if use_cuda:
+            inputs, targets = inputs.cuda(), targets.cuda()
+        inputs = torch.autograd.Variable(inputs)
+        targets = torch.autograd.Variable(targets)
+
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+        accs = accuracy(outputs.data, targets, topks)
+        train_loss.update(loss.data[0], inputs.size(0))
+        for k, acc in enumerate(accs):
+            train_accs[k].update(acc[0], inputs.size(0))
+
+    train_accs = [(k, acc.avg) for k, acc in zip(topks, train_accs)]
+    text = ', '.join(['Acc@{}: {.4f}'.format(k, acc) for k, acc in train_accs])
+    print('  Loss: {.3f}, {}'.format(train_loss.avg, text))
+    return train_accs
+
+
+def validate(val_loader, model, criterion, topks=(1, 5), use_cuda=True):
+    val_loss = AverageMeter()
+    val_accs = [AverageMeter() for _ in topks]
+
+    # switch to evaluate mode
+    model.eval()
+
+    for i, (inputs, targets) in enumerate(val_loader, 1):
+        if use_cuda:
+            inputs, targets = inputs.cuda(), targets.cuda()
+        inputs = torch.autograd.Variable(inputs, volatile=True)
+        targets = torch.autograd.Variable(targets, volatile=True)
+
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+
+        accs = accuracy(outputs.data, targets, topks)
+        val_loss.update(loss.data[0], inputs.size(0))
+        for k, acc in enumerate(accs):
+            val_accs[k].update(acc[0], inputs.size(0))
+
+    val_accs = [(k, acc.avg) for k, acc in zip(topks, val_accs)]
+    text = ', '.join(['Acc@{}: {.4f}'.format(k, acc) for k, acc in val_accs])
+    print('  Loss: {.3f}, {}'.format(val_loss.avg, text))
+    return val_accs
+
+
+def save_checkpoint(state, is_best, file_path='tmps'):
     if not os.path.exists(file_path):
         os.makedirs(file_path)
     file_name = os.path.join(file_path, 'checkpoint.pth.tar')
@@ -190,45 +247,3 @@ def save_checkpoint(state, is_best, file_path='tmp'):
     if is_best:
         shutil.copyfile(file_name, os.path.join(file_path, 'model_best.pth.tar'))
 
-
-def validate(val_loader, model, criterion, topk=(1, 5), print_freq=1000):
-    batch_time = AverageMeter()
-    losses = AverageMeter()
-    top1 = AverageMeter()
-    top5 = AverageMeter()
-
-    # switch to evaluate mode
-    model.eval()
-
-    end = time.time()
-    for i, (input, target) in enumerate(val_loader, 1):
-        target = target.cuda(async=True)
-        input_var = torch.autograd.Variable(input, volatile=True)
-        target_var = torch.autograd.Variable(target, volatile=True)
-
-        # compute output
-        output = model(input_var)
-
-        # measure accuracy and record loss
-        loss = criterion(output, target_var)
-        prec1, prec5 = accuracy(output.data, target, topk)
-
-        losses.update(loss.data[0], input.size(0))
-        top1.update(prec1[0], input.size(0))
-        top5.update(prec5[0], input.size(0))
-
-        # measure elapsed time
-        batch_time.update(time.time() - end)
-        end = time.time()
-
-        if i % print_freq == 0 or i == len(val_loader):
-            print('Test : [{0}/{1}]\t'
-                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\n\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Prec@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                  'Prec@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                   i, len(val_loader), batch_time=batch_time, loss=losses, top1=top1, top5=top5))
-
-    print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
-
-    return top1.avg
