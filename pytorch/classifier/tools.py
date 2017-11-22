@@ -4,7 +4,9 @@ import os
 import shutil
 import codecs
 import torch
+import numpy as np
 from PIL import Image
+from sklearn.preprocessing import label_binarize
 
 
 IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm']
@@ -95,7 +97,7 @@ def get_mean_and_std(dataset, num_workers=4):
     dataset = ImageFolder('/your/image/path/')
     get_mean_and_std(dataset)
     '''
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, num_workers=num_workers)
+    dataloader = torch.utils.data.DataLoader(dataset, num_workers=num_workers)
     mean = torch.zeros(3)
     std = torch.zeros(3)
     print('==> Computing mean and std..')
@@ -120,22 +122,33 @@ def test(model, inputs, maxk=1, softmax=None):
     return outputs.topk(maxk, 1)
 
 
-def eval(model, inputs, targets, topks=(1,), softmax=None):
-    '''evaluate model in topks
-    import torch.nn as nn
-    softmax = nn.Softmax()
-    '''
-    score, pred = test(model, inputs, max(topks), softmax)
-    score = score.t()
-    pred = pred.t()
-    correct = pred.eq(targets.view(1, -1).expand_as(pred)).float()
+def eval(dataset, classes, model, batch_size=32, num_workers=8, softmax=True):
+    '''evaluate model
+    dataset = ImageFolder('/your/image/path/')
 
-    res = []
-    for k in topks:
-        score_k = score[:k].sum(0, keepdim=True)
-        correct_k = correct[:k].sum(0, keepdim=True)
-        res.append((score_k[0].tolist(), correct_k[0].tolist()))
-    return res
+    # if you need sequence of integer labels
+    y_targets.argmax(1), y_outputs.argmax(1)
+    '''
+    model.eval()
+    if softmax:
+        softmax = torch.nn.Softmax()
+    y_targets, y_outputs = None, None
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
+    for inputs, targets in dataloader:
+        inputs_var = torch.autograd.Variable(inputs, volatile=True)
+        outputs_var = model(inputs_var)
+        if softmax:
+            outputs_var = softmax(outputs_var)
+        outputs = outputs_var.data
+        b_targets = label_binarize(targets.numpy(), classes)
+        b_outputs = outputs.numpy()
+        if y_targets is None:
+            y_targets = b_targets
+            y_outputs = b_outputs
+        else:
+            y_targets = np.r_[y_targets, b_targets]
+            y_outputs = np.r_[y_outputs, b_outputs]
+    return y_targets, y_outputs
 
 
 class AverageMeter(object):

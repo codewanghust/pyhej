@@ -47,7 +47,7 @@ def confusion_matrix(y_true, y_pred, classes, normalize=False, cmap=plt.cm.Blues
     classes = ['class {}'.format(i) for i in range(y_test.max()+1)]
     confusion_matrix(y_true, y_pred, classes)
     '''
-    conf_matrix = metrics.confusion_matrix(y_test, y_pred)
+    conf_matrix = metrics.confusion_matrix(y_true, y_pred)
     if normalize:
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
     plt.imshow(conf_matrix, interpolation='nearest', cmap=cmap)

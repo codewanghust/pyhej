@@ -17,8 +17,8 @@ cfg.data = '/data2/tmps/1114_not_medical_c10/tmp'
 
 cfg.use_cuda = True
 cfg.model_name = 'resnet50'
-cfg.pretrained = True
-cfg.num_classes = 1000
+cfg.pretrained = False
+cfg.num_classes = 6
 
 cfg.lr = 0.1
 cfg.momentum = 0.9
@@ -31,13 +31,13 @@ cfg.resume = ''
 
 cfg.batch_size = 32
 cfg.workers = 8
-cfg.epochs = 500
+cfg.epochs = 900
 cfg.output = '/data2/tmps/1114_not_medical_c10/models/{}_{}'.format(cfg.model_name, time.strftime('%y%m%d'))
 
 
 # create model
 model = models.__dict__[cfg.model_name](pretrained=cfg.pretrained, num_classes=cfg.num_classes)
-model = nn.DataParallel(model).cuda()
+model = nn.DataParallel(model)
 if cfg.use_cuda:
     model = model.cuda()
 
@@ -65,7 +65,7 @@ traindir, valdir = os.path.join(cfg.data, 'train'), os.path.join(cfg.data, 'val'
 train_dataset = ImageFolder(traindir,
     transforms.Compose([
         # new version replace `Scale` with `Resize`, `RandomSizedCrop` with `RandomResizedCrop`
-        transforms.Scale((235, 235)),
+        transforms.Scale((224, 224)),
         transforms.RandomSizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -75,7 +75,7 @@ train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg.batch_s
 val_dataset = ImageFolder(valdir,
     transforms.Compose([
         # new version replace `Scale` with `Resize`, `RandomSizedCrop` with `RandomResizedCrop`
-        transforms.Scale((235, 235)),
+        transforms.Scale((224, 224)),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
