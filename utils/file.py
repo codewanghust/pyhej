@@ -29,4 +29,3 @@ def download(furls, outdir='tmps', prefix=''):
             urlretrieve(furl, fpath)
         except Exception:
             print('* Fail | [{}, {}]'.format(i, furl))
-

@@ -29,9 +29,9 @@ cfg.best_accs = [(1, 0), (3, 0)]
 cfg.topks = (1, 3)
 cfg.resume = ''
 
-cfg.batch_size = 64
+cfg.batch_size = 32
 cfg.workers = 8
-cfg.epochs = 200
+cfg.epochs = 500
 cfg.output = '/data2/tmps/1114_not_medical_c10/models/{}_{}'.format(cfg.model_name, time.strftime('%y%m%d'))
 
 
@@ -65,7 +65,7 @@ traindir, valdir = os.path.join(cfg.data, 'train'), os.path.join(cfg.data, 'val'
 train_dataset = ImageFolder(traindir,
     transforms.Compose([
         # new version replace `Scale` with `Resize`, `RandomSizedCrop` with `RandomResizedCrop`
-        transforms.Scale((256, 256)),
+        transforms.Scale((235, 235)),
         transforms.RandomSizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -75,7 +75,7 @@ train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg.batch_s
 val_dataset = ImageFolder(valdir,
     transforms.Compose([
         # new version replace `Scale` with `Resize`, `RandomSizedCrop` with `RandomResizedCrop`
-        transforms.Scale((256, 256)),
+        transforms.Scale((235, 235)),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
@@ -100,3 +100,6 @@ for epoch in range(cfg.epochs):
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict()
     }, is_best, cfg.output)
+
+
+cfg
