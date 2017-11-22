@@ -139,7 +139,7 @@ def eval(dataset, classes, model, batch_size=32, num_workers=8, softmax=True):
         outputs_var = model(inputs_var)
         if softmax:
             outputs_var = softmax(outputs_var)
-        outputs = outputs_var.data
+        outputs = outputs_var.data.cpu()
         b_targets = label_binarize(targets.numpy(), classes)
         b_outputs = outputs.numpy()
         if y_targets is None:
