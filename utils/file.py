@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import requests
+from io import BytesIO
 from six.moves.urllib.request import urlretrieve
 
 
@@ -10,8 +11,8 @@ URL_REGEX = re.compile(r'http://|https://|ftp://')
 
 def read(filename, default=None):
     try:
-        if URL_REGEX.match(filename) is not None:
-            return requests.get(filename).content
+        if URL_REGEX.match(filename):
+            return BytesIO(requests.get(filename).content)
         with open(filename, 'rb') as f:
             return f.read()
     except:
