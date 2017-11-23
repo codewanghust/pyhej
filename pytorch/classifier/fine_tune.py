@@ -69,7 +69,8 @@ train_dataset = ImageFolder(traindir,
         transforms.RandomSizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.Normalize(mean=[0.4809, 0.4748, 0.4503], std=[0.2344, 0.2301, 0.2304]),
     ]))
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg.batch_size, shuffle=True, num_workers=cfg.workers, pin_memory=True)
 val_dataset = ImageFolder(valdir,
@@ -78,7 +79,8 @@ val_dataset = ImageFolder(valdir,
         transforms.Scale((224, 224)),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        transforms.Normalize(mean=[0.4809, 0.4748, 0.4503], std=[0.2344, 0.2301, 0.2304]),
     ]))
 val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=cfg.batch_size, shuffle=False, num_workers=cfg.workers, pin_memory=True)
 

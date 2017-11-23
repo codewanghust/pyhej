@@ -94,8 +94,10 @@ class ImageFile(torch.utils.data.Dataset):
 
 def get_mean_and_std(dataset, num_workers=4):
     '''Compute the mean and std value of dataset.
-    dataset = ImageFolder('/your/image/path/')
-    get_mean_and_std(dataset)
+    import torchvision.transforms as transforms
+    from pyhej.pytorch.classifier.tools import ImageFolder, get_mean_and_std
+    dataset = ImageFolder('/your/image/path/', transforms.ToTensor())
+    get_mean_and_std(dataset, 8)
     '''
     dataloader = torch.utils.data.DataLoader(dataset, num_workers=num_workers)
     mean = torch.zeros(3)
@@ -128,6 +130,9 @@ def eval(dataset, classes, model, batch_size=32, num_workers=8, softmax=True):
 
     # if you need sequence of integer labels
     y_targets.argmax(1), y_outputs.argmax(1)
+
+    # or you want to test topk
+    y_targets[:, :k].sum(axis=1), y_outputs[:, :k].sum(axis=1)
     '''
     model.eval()
     if softmax:

@@ -3,7 +3,8 @@ from .trie import Trie
 
 
 class Faster(object):
-    """docstring for Faster"""
+    '''docstring for Faster
+    '''
     def __init__(self, data):
         self.trie = Trie()
         for word, label in data:

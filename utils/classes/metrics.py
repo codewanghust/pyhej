@@ -58,7 +58,7 @@ def confusion_matrix(y_true, y_pred, classes, normalize=False, cmap=plt.cm.Blues
     fmt = '.2f' if normalize else 'd'
     thresh = conf_matrix.max() / 2.
     for i, j in itertools.product(range(conf_matrix.shape[0]), range(conf_matrix.shape[1])):
-        plt.text(j, i, format(conf_matrix[i, j], fmt), horizontalalignment="center", color="white" if conf_matrix[i, j] > thresh else "black")
+        plt.text(j, i, format(conf_matrix[i, j], fmt), horizontalalignment='center', color='white' if conf_matrix[i, j] > thresh else 'black')
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')

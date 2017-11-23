@@ -1,7 +1,7 @@
 import numpy as np
 from .image import load_img, img_to_array
 def predict_on_batch(model, data, datagen, target_size=None):
-    """
+    '''
     Predict on batch
 
     # Arguments
@@ -15,7 +15,7 @@ def predict_on_batch(model, data, datagen, target_size=None):
 
     # Raises
         ..
-    """
+    '''
     res = []
     for fname, _ in data:
         img = load_img(fname, target_size=target_size)
@@ -27,7 +27,7 @@ def predict_on_batch(model, data, datagen, target_size=None):
 
 import numpy as np
 def evaluate_categorical(lys, ly_, topn=1):
-    """
+    '''
     Predict on batch
 
     # Arguments
@@ -40,7 +40,7 @@ def evaluate_categorical(lys, ly_, topn=1):
 
     # Raises
         ..
-    """
+    '''
     res = []
     for ys, y_ in zip(lys, ly_):
         tmp = np.argsort(ys)[-topn:]
