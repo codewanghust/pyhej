@@ -1,5 +1,5 @@
 import codecs
-from .trie import Trie
+from pyhej.nlp.trie import Trie
 
 
 class Faster(object):
@@ -28,4 +28,3 @@ class Faster(object):
 
     def find(self, word):
         return self.trie.find(word)
-

@@ -47,4 +47,3 @@ class Trie(object):
 
     def delete_reverse(self, word):
         return self.delete(word[::-1])
-

@@ -1,6 +1,6 @@
 import editdistance
-from .trie import Trie
-from .string import normalize
+from pyhej.nlp.trie import Trie
+from pyhej.nlp.string import normalize
 
 
 def tool_ngram_skip(text, skip=1):

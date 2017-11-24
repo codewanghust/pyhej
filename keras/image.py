@@ -1,14 +1,14 @@
 '''https://github.com/flystarhe/keras/blob/master/keras/preprocessing/image.py
 '''
 import re
+import requests
+from io import BytesIO
+from PIL import Image as pil_image
 
 
 URL_REGEX = re.compile(r'http://|https://|ftp://')
 
 
-import requests
-from io import BytesIO
-from PIL import Image as pil_image
 def load_img(path, grayscale=False, target_size=None):
     '''
     Loads an image into PIL format
@@ -50,7 +50,6 @@ def load_img(path, grayscale=False, target_size=None):
     return img
 
 
-import numpy as np
 def img_to_array(img, data_format='channels_last'):
     '''
     Converts a PIL Image instance to a Numpy array
@@ -89,7 +88,6 @@ def img_to_array(img, data_format='channels_last'):
     return x
 
 
-from PIL import Image as pil_image
 def array_to_img(x, data_format='channels_last', scale=False):
     '''
     Converts a 3D Numpy array to a PIL Image instance
@@ -131,7 +129,6 @@ def array_to_img(x, data_format='channels_last', scale=False):
         raise ValueError('Unsupported channel number:', x.shape[2])
 
 
-from PIL import Image as pil_image
 def is_valid_img(path):
     '''
     Valid Image is ok
@@ -155,109 +152,3 @@ def is_valid_img(path):
         return False
 
     return True
-
-
-import multiprocessing
-import numpy as np
-def get_image_iter(data, target_size=None, batch_size=32, shuffle=False, seed=None, image_gen=None):
-    '''
-    A batch Iterator
-
-    # Arguments
-        data: List of `[(fpath, label), ..]`
-        target_size: `None` or tuple of `(height, width)`
-        batch_size: Integer, size of a batch
-        shuffle: Boolean, whether to shuffle
-        seed: `None` or seed for random
-        image_gen: `None` or function
-
-    # Returns
-        Iterator, `(batch_x, batch_y)`
-
-    # Raises
-        ..
-    '''
-    fpaths = []
-    labels = []
-    for fpath, label in data:
-        fpaths.append(fpath)
-        labels.append(label)
-
-    x_shape = target_size + (3,)
-    y_shape = (max(labels) + 1,)
-
-    index_iter = get_index_iter(len(fpaths), batch_size, shuffle, seed)
-
-    while 1:
-        batch_index, batch_size = next(index_iter)
-
-        batch_x = np.zeros((batch_size,) + x_shape, dtype=np.float32)
-        batch_y = np.zeros((batch_size,) + y_shape, dtype=np.float32)
-
-        results = []
-        pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
-        for index in batch_index:
-            results.append(pool.apply_async(get_image_iter_job, (fpaths[index], target_size, image_gen)))
-        pool.close()
-        pool.join()
-
-        for i, obj in enumerate(results):
-            batch_x[i] = obj.get()
-
-        for i, index in enumerate(batch_index):
-            batch_y[i, labels[index]] = 1.0
-
-        yield (batch_x, batch_y)
-
-
-def get_image_iter_job(fpath, target_size, image_gen):
-    img = load_img(fpath, target_size=target_size)
-    arr = img_to_array(img)
-    if image_gen is None:
-        return arr
-    return image_gen(arr)
-
-
-import numpy as np
-def get_index_iter(n, batch_size=1, shuffle=False, seed=None):
-    '''
-    A batch Iterator
-
-    # Arguments
-        n: Integer, total number of samples
-        batch_size: Integer, size of a batch
-        shuffle: Boolean, whether to shuffle
-        seed: Random seed for shuffling
-
-    # Returns
-        A Integer List
-
-    # Raises
-        ..
-    '''
-    epochs = 0
-    batch_pos = 0
-    while 1:
-        if batch_pos == 0:
-            epochs += 1
-            if shuffle:
-                if seed is not None:
-                    np.random.seed(seed + epochs)
-                index_array = np.random.permutation(n)
-            else:
-                index_array = np.arange(n)
-
-        current_index = batch_pos
-        if n > current_index + batch_size:
-            current_batch_size = batch_size
-            batch_pos = current_index + current_batch_size
-        else:
-            current_batch_size = n - current_index
-            batch_pos = 0
-
-        yield (index_array[current_index:current_index + current_batch_size], current_batch_size)
-
-
-class ImageDataGenerator(object):
-    pass
-

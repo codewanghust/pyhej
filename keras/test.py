@@ -1,5 +1,7 @@
 import numpy as np
-from .image import load_img, img_to_array
+from pyhej.keras.image import load_img, img_to_array
+
+
 def predict_on_batch(model, data, datagen, target_size=None):
     '''
     Predict on batch
@@ -25,7 +27,6 @@ def predict_on_batch(model, data, datagen, target_size=None):
     return res
 
 
-import numpy as np
 def evaluate_categorical(lys, ly_, topn=1):
     '''
     Predict on batch
@@ -46,4 +47,3 @@ def evaluate_categorical(lys, ly_, topn=1):
         tmp = np.argsort(ys)[-topn:]
         res.append(y_ in tmp)
     return (sum(res)/len(res), res)
-

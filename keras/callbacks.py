@@ -1,6 +1,8 @@
 import re
 import numpy as np
 from keras.callbacks import Callback
+
+
 class SaveBest(Callback):
     def __init__(self, filepath, monitor='val_.*?acc', mode='max'):
         super(SaveBest, self).__init__()
@@ -23,4 +25,3 @@ class SaveBest(Callback):
             filepath = self.filepath.format(epoch=epoch, best=current, **logs)
             self.model.save(filepath, overwrite=True)
             self.best = current
-

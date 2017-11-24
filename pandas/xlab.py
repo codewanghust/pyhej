@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from ..nlp.string import normalize
+from pyhej.nlp.string import normalize
 
 
 def df_json_loads(df, column, names):
@@ -83,4 +83,3 @@ def mergex_weight(groups, threshold=0.8):
                     umaps[key] = igroup[1].get(key, 0) + jgroup[1].get(key, 0)
                 groups.append([len(groups), umaps, igroup[2] + ',' + jgroup[2], True])
     return len(groups) - total
-

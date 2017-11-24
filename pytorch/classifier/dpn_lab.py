@@ -10,8 +10,8 @@ import torchvision
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from torch.autograd import Variable
-from .dpn import DPN92
-from .tools import save_checkpoint
+from pyhej.pytorch.classifier.dpn import DPN92
+from pyhej.pytorch.classifier.tools import save_checkpoint
 
 
 # Training
