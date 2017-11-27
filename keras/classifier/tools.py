@@ -70,7 +70,7 @@ def preprocess_input(x, x_mean=None):
     return x
 
 
-data_gen_args = dict(
+datagen_args = dict(
     rotation_range=40,  # randomly rotate images in the range (deg 0 to 180)
     width_shift_range=0.2,  # randomly shift images horizontally
     height_shift_range=0.2,  # randomly shift images vertically
@@ -83,7 +83,7 @@ data_gen_args = dict(
 
 def loader_from_directory(root, datagen=None, target_size=(32, 32), batch_size=32, shuffle=True, seed=None):
     if datagen is None:
-        datagen = ImageDataGenerator(**data_gen_args)
+        datagen = ImageDataGenerator(**datagen_args)
     elif isinstance(datagen, dict):
         datagen = ImageDataGenerator(**datagen)
     return DirectoryIterator(root, datagen, target_size=target_size, batch_size=batch_size, shuffle=shuffle, seed=seed)
