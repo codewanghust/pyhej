@@ -21,6 +21,7 @@ predictions = Dense(200, activation='softmax')(x)
 
 # this is the model we will train
 model = Model(inputs=base_model.input, outputs=predictions)
+model.summary()
 
 
 ################################################################
