@@ -14,16 +14,16 @@ def read_dicominfo(filename):
     try:
         plan = dicom.read_file(filename, force=True)
         temp = {'InstitutionName': plan.InstitutionName,  # 机构
-               'PatientID': plan.PatientID,  # 病人
-               'PatientName': plan.PatientName,  # 病人
-               'StudyDate': plan.StudyDate,  # study
-               'StudyTime': plan.StudyTime,  # study
-               'Modality': plan.Modality,  # 项目
-               'XRayTubeCurrent': plan.XRayTubeCurrent,  # 强度
-               'ImagePositionPatient': plan.ImagePositionPatient,  # 位置
-               'SeriesTime': plan.SeriesTime,  # series
-               'ExposureTime': plan.ExposureTime,  # exposure
-               'InstanceNumber': plan.InstanceNumber}  # 序号
+                'PatientID': plan.PatientID,  # 病人
+                'PatientName': plan.PatientName,  # 病人
+                'StudyDate': plan.StudyDate,  # study
+                'StudyTime': plan.StudyTime,  # study
+                'Modality': plan.Modality,  # 项目
+                'XRayTubeCurrent': plan.XRayTubeCurrent,  # 强度
+                'ImagePositionPatient': plan.ImagePositionPatient,  # 位置
+                'SeriesTime': plan.SeriesTime,  # series
+                'ExposureTime': plan.ExposureTime,  # exposure
+                'InstanceNumber': plan.InstanceNumber}  # 序号
     except Exception as e:
         temp = None
     return temp
