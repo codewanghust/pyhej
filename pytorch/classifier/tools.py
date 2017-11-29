@@ -23,7 +23,7 @@ def is_image_file(filename):
     return any(filename_lower.endswith(ext) for ext in IMG_EXTENSIONS)
 
 
-class ImageFolder(torch.utils.data.Dataset):
+class DatasetFromFolder(torch.utils.data.Dataset):
     def __init__(self, root, transform=None, target_transform=None):
         images = []
         for i, target in enumerate(sorted(os.listdir(root))):
@@ -57,7 +57,7 @@ class ImageFolder(torch.utils.data.Dataset):
         return len(self.images)
 
 
-class ImageFile(torch.utils.data.Dataset):
+class DatasetFromFile(torch.utils.data.Dataset):
     def __init__(self, filename, transform=None, target_transform=None):
         images = []
         with codecs.open(filename, 'r', 'utf-8') as reader:
@@ -95,8 +95,8 @@ class ImageFile(torch.utils.data.Dataset):
 def get_mean_and_std(dataset, num_workers=4):
     '''Compute the mean and std value of dataset.
     import torchvision.transforms as transforms
-    from pyhej.pytorch.classifier.tools import ImageFolder, get_mean_and_std
-    dataset = ImageFolder('/your/image/path/', transforms.ToTensor())
+    from pyhej.pytorch.classifier.tools import DatasetFromFolder, get_mean_and_std
+    dataset = DatasetFromFolder('/your/image/path/', transforms.ToTensor())
     get_mean_and_std(dataset, 8)
     '''
     dataloader = torch.utils.data.DataLoader(dataset, num_workers=num_workers)
@@ -126,7 +126,7 @@ def test(model, inputs, maxk=1, softmax=None):
 
 def eval(dataset, classes, model, batch_size=32, num_workers=8, softmax=True):
     '''evaluate model
-    dataset = ImageFolder('/your/image/path/')
+    dataset = DatasetFromFolder('/your/image/path/')
 
     # if you need sequence of integer labels
     y_targets.argmax(1), y_outputs.argmax(1)
