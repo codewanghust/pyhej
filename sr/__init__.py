@@ -2,6 +2,7 @@ import time
 import math
 import numpy as np
 from PIL import Image as pil_image
+from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 
 
