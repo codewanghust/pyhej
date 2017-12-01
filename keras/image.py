@@ -10,15 +10,14 @@ from PIL import Image as pil_image
 URL_REGEX = re.compile(r'http://|https://|ftp://')
 
 
-def load_img(path, grayscale=False, target_size=None):
-    '''
-    Loads an image into PIL format
+def load_img(path, mode=None, target_size=None):
+    '''Loads an image into PIL format
     Notes: PIL image has format `(width, height, channel)`
            Numpy array has format `(height, width, channel)`
 
     # Arguments
         path: Path to image file or url
-        grayscale: Boolean, whether to load the image as grayscale
+        mode: String, must in {None, 'L', 'RGB', 'YCbCr'}
         target_size: `None` or tuple of ints `(height, width)`
 
     # Returns
@@ -27,6 +26,8 @@ def load_img(path, grayscale=False, target_size=None):
     # Raises
         ..
     '''
+    assert mode in {None, 'L', 'RGB', 'YCbCr'}, "mode must in {None, 'L', 'RGB', 'YCbCr'}"
+
     try:
         if URL_REGEX.match(path):
             response = requests.get(path)
@@ -36,12 +37,9 @@ def load_img(path, grayscale=False, target_size=None):
     except IOError:
         return None
 
-    if grayscale:
-        if img.mode != 'L':
-            img = img.convert('L')
-    else:
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
+    if mode is not None:
+        if img.mode != mode:
+            img = img.convert(mode)
 
     if target_size is not None:
         wh_tuple = (target_size[1], target_size[0])
@@ -52,8 +50,7 @@ def load_img(path, grayscale=False, target_size=None):
 
 
 def img_to_array(img, data_format='channels_last'):
-    '''
-    Converts a PIL Image instance to a Numpy array
+    '''Converts a PIL Image instance to a Numpy array
     Notes: PIL image has format `(width, height, channel)`
            Numpy array has format `(height, width, channel)`
 
@@ -75,14 +72,14 @@ def img_to_array(img, data_format='channels_last'):
 
     x = np.asarray(img, dtype=np.float32)
 
-    if len(x.shape) == 3:
+    if x.ndim == 3:
         if data_format == 'channels_first':
             x = x.transpose(2, 0, 1)
-    elif len(x.shape) == 2:
+    elif x.ndim == 2:
         if data_format == 'channels_first':
-            x = x.reshape((1, x.shape[0], x.shape[1]))
+            x = x.reshape((1,) + x.shape)
         else:
-            x = x.reshape((x.shape[0], x.shape[1], 1))
+            x = x.reshape(x.shape + (1,))
     else:
         raise ValueError('Unsupported image shape:', x.shape)
 
@@ -90,8 +87,7 @@ def img_to_array(img, data_format='channels_last'):
 
 
 def array_to_img(x, data_format='channels_last', scale=False):
-    '''
-    Converts a 3D Numpy array to a PIL Image instance
+    '''Converts a 3D Numpy array to a PIL Image instance
     Notes: PIL image has format `(width, height, channel)`
            Numpy array has format `(height, width, channel)`
 
@@ -106,6 +102,9 @@ def array_to_img(x, data_format='channels_last', scale=False):
     # Raises
         ValueError: if invalid `x` or `data_format` is passed
     '''
+    if x.ndim == 2:
+        x = x.reshape(x.shape + (1,))
+
     if x.ndim != 3:
         raise ValueError('Image array to have rank 3.', x.shape)
 
@@ -114,42 +113,18 @@ def array_to_img(x, data_format='channels_last', scale=False):
 
     if data_format == 'channels_first':
         x = x.transpose(1, 2, 0)
+
     if scale:
-        x = x + max(-np.min(x), 0)
+        x = x.astype(np.float32)
+        x += max(-np.min(x), 0)
         x_max = np.max(x)
-        if x_max != 0:
+        if x_max > 0:
             x /= x_max
         x *= 255
+
     if x.shape[2] == 3:
-        # RGB
         return pil_image.fromarray(x.astype('uint8'), 'RGB')
     elif x.shape[2] == 1:
-        # grayscale
         return pil_image.fromarray(x[:, :, 0].astype('uint8'), 'L')
     else:
         raise ValueError('Unsupported channel number:', x.shape[2])
-
-
-def is_valid_img(path):
-    '''
-    Valid Image is ok
-
-    # Arguments
-        path: Path to image file
-
-    # Returns
-        Boolean
-
-    # Raises
-        ..
-    '''
-    try:
-        img = pil_image.open(path)
-        img.verify()
-    except:
-        return False
-
-    if min(img.size) < 1:
-        return False
-
-    return True
