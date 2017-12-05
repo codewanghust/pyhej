@@ -1,4 +1,3 @@
-
 ## module: genplate
 车牌生成器,参考[szad670401](https://github.com/szad670401/end-to-end-for-chinese-plate-recognition)实现,对代码进行了精简,支持py3.
 
@@ -14,9 +13,12 @@ git clone https://gitee.com/flystarhe/slyx_mdisp_guess.git
 cd slyx_mdisp_guess
 git submodule init
 git submodule update
-
-git remote set-url origin https://git.medatc.cc/medatc/mdisp-guess.git
-git remote add origin-hej https://gitee.com/flystarhe/slyx_mdisp_guess.git
 ```
 
-技巧,当需要`pull`子模块时,如果你不想在子目录中手动抓取与合并,那么还有种更容易的方式.运行`git submodule update --remote`,Git将会进入子模块然后抓取并更新.
+技巧,当需要`pull`子模块时,如果你不想在子目录中手动抓取与合并,那么还有种更容易的方式:`git submodule update --remote`,Git将会进入子模块然后抓取并更新.当然`push`前执行`git submodule update --remote`也是个好习惯.
+
+### Add | Update
+```
+git remote add origin https://gitee.com/flystarhe/slyx_mdisp_guess_1.git
+git remote set-url origin https://gitee.com/flystarhe/slyx_mdisp_guess_2.git
+```
