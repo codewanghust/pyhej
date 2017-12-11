@@ -152,7 +152,7 @@ def image_new(size, color=None):
 def draw_text(img, pos, text, font=None, fill=None):
     '''
     img: PIL.Image.Image object
-    pos: A 2-tuple, containing (width, height) in pixels
+    pos: Top left corner of the text
     text: A text
     '''
     if font is None:
@@ -170,7 +170,7 @@ def draw_text(img, pos, text, font=None, fill=None):
 def draw_polygon(img, xys, fill=None, outline=None):
     '''
     img: PIL.Image.Image object
-    xys: such as [(width, height), ..]
+    xys: [(x, y), (x, y), ...] or [x, y, x, y, ...]
     '''
     draw = ImageDraw.Draw(img)
     draw.polygon(xys, fill, outline)
@@ -181,7 +181,7 @@ def draw_polygon(img, xys, fill=None, outline=None):
 def draw_rectangle(img, xys, fill=None, outline=None):
     '''
     img: PIL.Image.Image object
-    xys: such as (x_left, y_top, width, height)
+    xys: [(x0, y0), (x1, y1)] or [x0, y0, x1, y1]
     '''
     draw = ImageDraw.Draw(img)
     draw.rectangle(xys, fill, outline)
