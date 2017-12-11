@@ -1,68 +1,78 @@
-import time
 import math
 import numpy as np
-from PIL import Image as pil_image
+from PIL import Image
+import matplotlib.pyplot as plt
 import torch.autograd as autograd
 from torchvision.transforms import ToTensor
-import matplotlib.pyplot as plt
+from pyhej.pillow import image_new, draw_text
 
 
 def PSNR(pred, gt):
     imdff = pred - gt
-    rmse = math.sqrt(np.mean(imdff ** 2))
+    rmse = np.mean(imdff**2)
     if rmse == 0:
         return 100
-    return 20 * math.log10(255. / rmse)
+    return 10 * math.log10(255.**2 / rmse)
 
 
 def test(model, img_b, img_gt=None, cuda=False):
-    img_b = pil_image.open(img_b).convert('YCbCr')
+    '''model of sub_pixel
+    '''
+    img_b = Image.open(img_b).convert('YCbCr')
     y, cb, cr = img_b.split()
 
-    input = ToTensor()(y)
+    input = autograd.Variable(ToTensor()(y)).view(1, -1, y.size[1], y.size[0])
     if cuda:
         input = input.cuda()
 
-    output = model(autograd.Variable(input).view(1, -1, y.size[1], y.size[0]))
+    output = model(input)
     if cuda:
         output = output.cpu()
 
-    out_img_arr = output.data[0].numpy()
-    out_img_arr *= 255.0
-    out_img_arr = out_img_arr.clip(0, 255)
-    out_img_y = pil_image.fromarray(np.uint8(out_img_arr[0]), mode='L')
-
-    out_img_cb = cb.resize(out_img_y.size, pil_image.BICUBIC)
-    out_img_cr = cr.resize(out_img_y.size, pil_image.BICUBIC)
-    out_img = pil_image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
+    out_img_y = output.data[0].numpy()
+    out_img_y *= 255.0
+    out_img_y = out_img_y.clip(0, 255)
 
     if img_gt:
-        img_gt = pil_image.open(img_gt).convert('YCbCr')
+        img_gt = Image.open(img_gt).convert('YCbCr')
         y, cb, cr = img_gt.split()
-        psnr = PSNR(out_img_arr[0], np.asarray(y, dtype=np.float32))
+        psnr = PSNR(out_img_y[0], np.asarray(y, dtype=np.float32))
     else:
         psnr = None
+
+    out_img_y = Image.fromarray(np.uint8(out_img_y[0]), mode='L')
+    out_img_cb = cb.resize(out_img_y.size, Image.BICUBIC)
+    out_img_cr = cr.resize(out_img_y.size, Image.BICUBIC)
+    out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
 
     return out_img, psnr
 
 
-def imprint(img_b, img_h, img_gt=None, plan='DNN'):
-    if isinstance(img_b, str):
-        img_b = pil_image.open(img_b)
-
-    fig = plt.figure(figsize=(12, 4))
+def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
+    '''
+    img_h: A PIL Image
+    img_b: A file path
+    img_gt: A file path
+    '''
+    img_b = Image.open(img_b).convert('RGB')
+    wid, hei = img_b.size
 
     if img_gt:
-        img_gt = pil_image.open(img_gt)
-        ax = plt.subplot('131')
-        ax.imshow(img_gt, cmap='gray')
-        ax.set_title('GT')
+        img_gt = Image.open(img_gt).convert('RGB')
+        out = image_new((wid*3, hei), (255, 255, 255))
+        out.paste(img_gt, (0, 0))
+        out.paste(img_b , (0+wid, 0))
+        out.paste(img_h , (0+wid*2, 0))
+    else:
+        out = image_new((wid*2, hei), (255, 255, 255))
+        out.paste(img_b, (0, 0))
+        out.paste(img_h, (0+wid, 0))
 
-    ax = plt.subplot('132')
-    ax.imshow(img_b, cmap='gray')
-    ax.set_title('Input')
+    if text:
+        draw_text(out, (0, int(hei*0.7)), text)
 
-    ax = plt.subplot('133')
-    ax.imshow(img_h, cmap='gray')
-    ax.set_title('Output(PSNR={})'.format(plan))
-    plt.show()
+    if filename:
+        out.save(filename)
+        return filename
+    else:
+        return out
