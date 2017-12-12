@@ -15,6 +15,23 @@ def PSNR(pred, gt):
     return 10 * math.log10(255.**2 / rmse)
 
 
+def colorize(y, ycbcr):
+    '''
+    ycbcr:
+      from scipy.ndimage import imread
+      ycbcr = imread(image_file, mode='YCbCr')
+      y = ycbcr[:,:,0].astype(np.float32)
+      cb = ycbcr[:,:,1].astype(np.float32)
+      cr = ycbcr[:,:,2].astype(np.float32)
+    '''
+    img = np.zeros((y.shape[0], y.shape[1], 3), np.uint8)
+    img[:,:,0] = y
+    img[:,:,1] = ycbcr[:,:,1]
+    img[:,:,2] = ycbcr[:,:,2]
+    img = Image.fromarray(img, 'YCbCr').convert('RGB')
+    return img
+
+
 def test(model, img_b, img_gt=None, cuda=False):
     '''model of sub_pixel
     '''
