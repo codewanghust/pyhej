@@ -73,7 +73,7 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
         out.paste(img_h, (0+wid_b, 0))
 
     if text:
-        draw_text(out, (0, 0), text)
+        draw_text(out, (0, 0), text, fill=(255, 0, 0))
 
     if filename:
         out.save(filename)
