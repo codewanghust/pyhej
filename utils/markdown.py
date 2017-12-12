@@ -18,7 +18,7 @@ class MD(object):
         self.writer.write('\n\n')
 
     def add_code(self, code):
-        self.writer.write('\n```\n')
+        self.writer.write('```\n')
         self.writer.write(code)
         self.writer.write('\n```\n')
 
