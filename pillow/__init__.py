@@ -162,7 +162,7 @@ def draw_text(img, pos, text, font=None, fill=None):
         fill = def_color
 
     draw = ImageDraw.Draw(img)
-    draw.text(pos, text, font=font, file=fill)
+    draw.text(pos, text, font=font, fill=fill)
 
     return None
 
