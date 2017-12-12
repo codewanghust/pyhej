@@ -54,8 +54,8 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
     img_b: A file path
     img_gt: A file path
     '''
+    wid, hei = img_h.size
     img_b = Image.open(img_b).convert('RGB')
-    wid, hei = img_b.size
 
     if img_gt:
         img_gt = Image.open(img_gt).convert('RGB')
@@ -69,7 +69,7 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
         out.paste(img_h, (0+wid, 0))
 
     if text:
-        draw_text(out, (0, int(hei*0.7)), text)
+        draw_text(out, (0, 0), text)
 
     if filename:
         out.save(filename)
