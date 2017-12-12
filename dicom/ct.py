@@ -25,8 +25,8 @@ def read_dicominfo(filename):
                 'ExposureTime': plan.ExposureTime,  # exposure
                 'InstanceNumber': plan.InstanceNumber}  # 序号
     except Exception as e:
-        temp = None
-    return temp
+        temp, plan = None, None
+    return temp, plan
 
 
 def read_dicom(filename):

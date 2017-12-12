@@ -20,11 +20,10 @@ def read_dicominfo(path):
                 'InstanceNumber': plan.InstanceNumber,
                 'MagneticFieldStrength': plan.MagneticFieldStrength,
                 'ImagePositionPatient': seq2str(plan.ImagePositionPatient),
-                'SeriesDescription': plan.SeriesDescription,
                 'Path': path}
     except Exception as e:
-        temp = None
-    return temp
+        temp, plan = None, None
+    return temp, plan
 
 
 def read_dicom(path):
