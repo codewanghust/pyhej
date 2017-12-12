@@ -11,7 +11,7 @@ ref_path = os.path.join(ref_path, '..')
 ref_path = os.path.abspath(ref_path)
 
 
-def_font = ImageFont.truetype(os.path.join(ref_path, 'fonts/DENG.TTF'))
+def_font = ImageFont.truetype(os.path.join(ref_path, 'fonts/DENG.TTF'), size=32)
 def_color = (0, 0, 0)
 
 
