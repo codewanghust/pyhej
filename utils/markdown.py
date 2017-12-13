@@ -15,7 +15,7 @@ class MD(object):
 
     def add_text(self, text):
         self.writer.write(text)
-        self.writer.write('\n\n')
+        self.writer.write('  \n')
 
     def add_code(self, code):
         self.writer.write('```\n')
@@ -23,12 +23,12 @@ class MD(object):
         self.writer.write('\n```\n')
 
     def add_topic(self, topic, level=2):
-        self.writer.write('\n{} {}'.format('#'*level, topic))
+        self.writer.write('{} {}'.format('#'*level, topic))
         self.writer.write('\n')
 
     def add_image(self, fpath):
-        self.writer.write('\n![]({})'.format(fpath))
-        self.writer.write('\n')
+        self.writer.write('![]({})'.format(fpath))
+        self.writer.write('  \n')
 
     def close(self):
         self.writer.close()
