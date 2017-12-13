@@ -71,9 +71,9 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
     img_b: A file path
     img_gt: A file path
     '''
-    img_b = Image.open(img_b).convert('RGB')
-
     wid_h, hei_h = img_h.size
+    img_b = Image.open(img_b).convert('RGB')
+    img_b = img_b.resize((wid_h, hei_h), Image.BICUBIC)
 
     if img_gt:
         img_gt = Image.open(img_gt).convert('RGB')
