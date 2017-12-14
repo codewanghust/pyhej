@@ -12,20 +12,6 @@ from torchvision.transforms import ToTensor
 from pyhej.pillow import image_new, draw_text
 
 
-class DatasetFromH5(data.Dataset):
-    def __init__(self, file_path):
-        super(DatasetFromHdf5, self).__init__()
-        hf = h5py.File(file_path)
-        self.data = hf.get('data')
-        self.target = hf.get('label')
-
-    def __getitem__(self, index):
-        return torch.from_numpy(self.data[index,:,:,:]).float(), torch.from_numpy(self.target[index,:,:,:]).float()
-
-    def __len__(self):
-        return self.data.shape[0]
-
-
 def PSNR(pred, gt):
     imdff = pred - gt
     mse = np.mean(imdff**2)
@@ -72,6 +58,20 @@ def load_img(img_l, img_h, upscale_factor=None):
     return img_l_y, img_h_y
 
 
+class DatasetFromH5(data.Dataset):
+    def __init__(self, file_path):
+        super(DatasetFromHdf5, self).__init__()
+        hf = h5py.File(file_path)
+        self.data = hf.get('data')
+        self.target = hf.get('label')
+
+    def __getitem__(self, index):
+        return torch.from_numpy(self.data[index,:,:,:]).float(), torch.from_numpy(self.target[index,:,:,:]).float()
+
+    def __len__(self):
+        return self.data.shape[0]
+
+
 class DatasetFromFile(data.Dataset):
     def __init__(self, images, input_transform=None, target_transform=None, upscale_factor=None):
         '''
@@ -116,6 +116,21 @@ class DatasetFromFile(data.Dataset):
 
     def __len__(self):
         return len(self.images)
+
+
+def adjust_lr_base(epoch, step=30, init_lr=0.01):
+    '''Sets the learning rate to the initial LR decayed by 10 every 30 epochs
+    '''
+    lr = init_lr * (0.1 ** (epoch // step))
+    return lr
+
+
+def adjust_lr_opti(optimizer, epoch, step=30, init_lr=0.01):
+    '''Sets the learning rate to the initial LR decayed by 10 every 30 epochs
+    '''
+    lr = init_lr * (0.1 ** (epoch // step))
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
 
 
 def train(cuda, epoch, model, criterion, optimizer, data_loader):
