@@ -1,18 +1,22 @@
+import os
+import codecs
+import shutil
 import math
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
+import torch
 import torch.autograd as autograd
+import torch.utils.data as data
 from torchvision.transforms import ToTensor
 from pyhej.pillow import image_new, draw_text
 
 
 def PSNR(pred, gt):
     imdff = pred - gt
-    rmse = np.mean(imdff**2)
-    if rmse == 0:
+    mse = np.mean(imdff**2)
+    if mse == 0:
         return 100
-    return 10 * math.log10(255.**2 / rmse)
+    return 10 * math.log10(255.**2 / mse)
 
 
 def colorize(y, ycbcr):
@@ -32,11 +36,141 @@ def colorize(y, ycbcr):
     return img
 
 
-def test(model, img_b, img_gt=None, cuda=False):
-    '''model of sub_pixel
+def load_img(img_l, img_h, upscale_factor=None):
+    img_l = Image.open(img_l).convert('YCbCr')
+    img_h = Image.open(img_h).convert('YCbCr')
+
+    if upscale_factor:
+        wid, hei = img_h.size
+        if wid % upscale_factor or hei % upscale_factor:
+            wid -= wid % upscale_factor
+            hei -= hei % upscale_factor
+            img_h = img_h.resize((wid, hei), Image.BICUBIC)
+
+        wid, hei = wid//upscale_factor, hei//upscale_factor
+        if img_l.size != (wid, hei):
+            img_l = img_l.resize((wid, hei), Image.BICUBIC)
+
+    img_l_y, _, _ = img_l.split()
+    img_h_y, _, _ = img_h.split()
+
+    return img_l_y, img_h_y
+
+
+class DatasetFromFile(data.Dataset):
+    def __init__(self, images, input_transform=None, target_transform=None, upscale_factor=None):
+        '''
+        images:
+          if str, a file path
+          if list, such as [('img001_l.jpg','img001_h.jpg'), ..]
+        '''
+        if isinstance(images, str):
+            self.images = []
+            with codecs.open(images, 'r', 'utf-8') as reader:
+                for i, line in enumerate(reader.readlines(), 1):
+                    img_b, img_h = line.strip().split(',')
+                    self.images.append((img_b, img_h))
+        else:
+            self.images = images
+
+        self.input_transform = input_transform
+        self.target_transform = target_transform
+        self.upscale_factor = upscale_factor
+
+    def __getitem__(self, index):
+        '''
+        Args:
+            index (int): Index
+        Returns:
+            tuple: (img_l, img_h)
+        '''
+        img_l, img_h = self.images[index]
+        input, target = load_img(img_l, img_h, self.upscale_factor)
+
+        if self.input_transform:
+            input = self.input_transform(input)
+        else:
+            input = ToTensor()(input)
+
+        if self.target_transform:
+            target = self.target_transform(target)
+        else:
+            target = ToTensor()(target)
+
+        return input, target
+
+    def __len__(self):
+        return len(self.images)
+
+
+def train(cuda, epoch, model, criterion, optimizer, data_loader):
+    model.train()
+    avg_loss = 0
+
+    for iteration, batch in enumerate(data_loader, 1):
+        inputs, targets = autograd.Variable(batch[0]), autograd.Variable(batch[1])
+        if cuda:
+            inputs = inputs.cuda()
+            targets = targets.cuda()
+
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        optimizer.step()
+
+        print('===> Epoch[{}]({}/{}): Loss: {:.4f}'.format(epoch, iteration, len(data_loader), loss.data[0]))
+        avg_loss += loss.data[0]
+
+    print('===> Train: Avg. Loss: {:.4f}'.format(avg_loss / len(data_loader)))
+    return avg_loss / len(data_loader)
+
+
+def test(cuda, epoch, model, criterion, data_loader):
+    model.eval()
+    avg_psnr = 0
+
+    for batch in data_loader:
+        inputs, targets = autograd.Variable(batch[0]), autograd.Variable(batch[1])
+        if cuda:
+            inputs = inputs.cuda()
+            targets = targets.cuda()
+
+        outputs = model(inputs)
+        loss = criterion(outputs, targets)
+
+        # if and only if `criterion = nn.MSELoss()`
+        # `ToTensor()(PIL Image)`:
+        #   Converts a PIL Image or numpy.ndarray (H x W x C) in the range [0, 255]
+        #   to (C x H x W) in the range [0.0, 1.0]
+        psnr = 10 * math.log10(1 / loss.data[0])
+        avg_psnr += psnr
+
+    print('===> Test : Avg. PSNR: {:.4f} dB'.format(avg_psnr / len(data_loader)))
+    return avg_psnr / len(data_loader)
+
+
+def save_checkpoint(state, save_dir, is_best=False, checkpoint='checkpoint.pth.tar'):
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    fname = os.path.join(save_dir, checkpoint)
+    torch.save(state, fname)
+    if is_best:
+        shutil.copyfile(fname, os.path.join(save_dir, 'model_best.pth.tar'))
+
+
+def prediction(model, img_b, upscale_factor=None, img_gt=None, cuda=False):
+    '''
+    upscale_factor:
+      if None, the same as sub_pixel model
+      if Integer, the same as bicubic+dnn model
     '''
     img_b = Image.open(img_b).convert('YCbCr')
     y, cb, cr = img_b.split()
+
+    if upscale_factor:
+        y = y.resize(tuple(i*upscale_factor for i in img_b.size), Image.BICUBIC)
 
     input = autograd.Variable(ToTensor()(y)).view(1, -1, y.size[1], y.size[0])
     if cuda:
@@ -46,21 +180,21 @@ def test(model, img_b, img_gt=None, cuda=False):
     if cuda:
         output = output.cpu()
 
-    out_img_y = output.data[0].numpy()
-    out_img_y *= 255.0
-    out_img_y = out_img_y.clip(0, 255)
+    output = output.data[0].numpy()
+    output *= 255.0
+    output = output.clip(0, 255)
+
+    out_img_y = Image.fromarray(np.uint8(output[0]), mode='L')
+    out_img_cb = cb.resize(out_img_y.size, Image.BICUBIC)
+    out_img_cr = cr.resize(out_img_y.size, Image.BICUBIC)
+    out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
 
     if img_gt:
         img_gt = Image.open(img_gt).convert('YCbCr')
         y, cb, cr = img_gt.split()
-        psnr = PSNR(out_img_y[0], np.asarray(y, dtype=np.float32))
+        psnr = PSNR(output[0], np.asarray(y, dtype=np.float32))
     else:
         psnr = None
-
-    out_img_y = Image.fromarray(np.uint8(out_img_y[0]), mode='L')
-    out_img_cb = cb.resize(out_img_y.size, Image.BICUBIC)
-    out_img_cr = cr.resize(out_img_y.size, Image.BICUBIC)
-    out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
 
     return out_img, psnr
 
@@ -71,21 +205,26 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
     img_b: A file path
     img_gt: A file path
     '''
-    wid_h, hei_h = img_h.size
     img_b = Image.open(img_b).convert('RGB')
-    img_b = img_b.resize((wid_h, hei_h), Image.BICUBIC)
 
     if img_gt:
         img_gt = Image.open(img_gt).convert('RGB')
 
-        out = image_new((wid_h*3, hei_h), (0, 0, 0))
+        img_b = img_b.resize(img_gt.size, Image.BICUBIC)
+        img_h = img_h.resize(img_gt.size, Image.BICUBIC)
+
+        wid, hei = img_gt.size
+        out = image_new((wid*3, hei), (0, 0, 0))
         out.paste(img_gt, (0, 0))
-        out.paste(img_b , (0+wid_h, 0))
-        out.paste(img_h , (0+wid_h*2, 0))
+        out.paste(img_b , (0+wid, 0))
+        out.paste(img_h , (0+wid+wid, 0))
     else:
-        out = image_new((wid_h*2, hei_h), (0, 0, 0))
+        img_b = img_b.resize(img_h.size, Image.BICUBIC)
+
+        wid, hei = img_gt.size
+        out = image_new((wid*2, hei), (0, 0, 0))
         out.paste(img_b, (0, 0))
-        out.paste(img_h, (0+wid_h, 0))
+        out.paste(img_h, (0+wid, 0))
 
     if text:
         draw_text(out, (5, 5), text, fill=(255, 0, 0))
