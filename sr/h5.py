@@ -71,13 +71,11 @@ sys.path.insert(0, '/data2/gits')
 
 from pyhej.sr.h5 import dataset_from_file, h5info
 
-dataset_from_file('/data2/datasets/slyx/mr2_sr_x2/dataset_train.txt',
-                  '/data2/datasets/slyx/mr2_sr_x2/dataset_train.h5',
+dataset_from_file('/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_train.txt',
+                  '/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_train.h5',
                   upscale=True)
-print(h5info('/data2/datasets/slyx/mr2_sr_x2/dataset_train.h5'))
 
-dataset_from_file('/data2/datasets/slyx/mr2_sr_x2/dataset_tests.txt',
-                  '/data2/datasets/slyx/mr2_sr_x2/dataset_tests.h5',
+dataset_from_file('/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_tests.txt',
+                  '/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_tests.h5',
                   upscale=True)
-print(h5info('/data2/datasets/slyx/mr2_sr_x2/dataset_tests.h5'))
 '''

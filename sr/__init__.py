@@ -149,7 +149,7 @@ def train(cuda, epoch, model, criterion, optimizer, data_loader):
         loss.backward()
         optimizer.step()
 
-        print('===> Epoch[{}]({}/{}): Loss: {:.4f}'.format(epoch, iteration, len(data_loader), loss.data[0]))
+        #print('===> Epoch[{}]({}/{}): Loss: {:.4f}'.format(epoch, iteration, len(data_loader), loss.data[0]))
         avg_loss += loss.data[0]
 
     print('===> Train: Avg. Loss: {:.4f}'.format(avg_loss / len(data_loader)))
