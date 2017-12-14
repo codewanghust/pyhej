@@ -60,7 +60,7 @@ def load_img(img_l, img_h, upscale_factor=None):
 
 class DatasetFromH5(data.Dataset):
     def __init__(self, file_path):
-        super(DatasetFromHdf5, self).__init__()
+        super(DatasetFromH5, self).__init__()
         hf = h5py.File(file_path)
         self.data = hf.get('data')
         self.target = hf.get('label')
