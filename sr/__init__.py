@@ -207,7 +207,7 @@ def save_checkpoint(state, save_dir, is_best=False, checkpoint='checkpoint.pth.t
         shutil.copyfile(fname, os.path.join(save_dir, 'model_best.pth.tar'))
 
 
-def prediction(model, img_b, target_size=None, img_gt=None, cuda=False):
+def prediction(model, img_b, target_size=None, img_gt=None, cuda=False, zero_center=False):
     '''
     target_size:
       if None, the same as sub_pixel model
@@ -221,12 +221,20 @@ def prediction(model, img_b, target_size=None, img_gt=None, cuda=False):
             y = y.resize(target_size, Image.BICUBIC)
 
     input = autograd.Variable(ToTensor()(y)).view(1, -1, y.size[1], y.size[0])
+    input_center = input.mean()
+
+    if zero_center:
+        input = input - input_center
+
     if cuda:
         input = input.cuda()
 
     output = model(input)
     if cuda:
         output = output.cpu()
+
+    if zero_center:
+        output = output + input_center
 
     output = output.data[0].numpy()
     output *= 255.0
