@@ -194,17 +194,18 @@ def save_checkpoint(state, save_dir, is_best=False, checkpoint='checkpoint.pth.t
         shutil.copyfile(fname, os.path.join(save_dir, 'model_best.pth.tar'))
 
 
-def prediction(model, img_b, upscale_factor=None, img_gt=None, cuda=False):
+def prediction(model, img_b, target_size=None, img_gt=None, cuda=False):
     '''
-    upscale_factor:
+    target_size:
       if None, the same as sub_pixel model
-      if Integer, the same as bicubic+dnn model
+      if tuple of ints (width, height), the same as bicubic+dnn model
     '''
     img_b = Image.open(img_b).convert('YCbCr')
     y, cb, cr = img_b.split()
 
-    if upscale_factor:
-        y = y.resize(tuple(i*upscale_factor for i in img_b.size), Image.BICUBIC)
+    if target_size:
+        if target_size != y.size:
+            y = y.resize(target_size, Image.BICUBIC)
 
     input = autograd.Variable(ToTensor()(y)).view(1, -1, y.size[1], y.size[0])
     if cuda:
