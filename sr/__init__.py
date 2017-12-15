@@ -59,21 +59,29 @@ def load_img(img_l, img_h, upscale_factor=None):
 
 
 class DatasetFromH5(data.Dataset):
-    def __init__(self, file_path):
+    def __init__(self, file_path, zero_center=False):
         super(DatasetFromH5, self).__init__()
         hf = h5py.File(file_path)
         self.data = hf.get('data')
-        self.target = hf.get('label')
+        self.label = hf.get('label')
+        self.zero_center = zero_center
 
     def __getitem__(self, index):
-        return torch.from_numpy(self.data[index,:,:,:]).float(), torch.from_numpy(self.target[index,:,:,:]).float()
+        input = self.data[index,:,:,:]
+        target = self.label[index,:,:,:]
+
+        if self.zero_center:
+            input = input - input.mean()
+            target = target - target.mean()
+
+        return torch.from_numpy(input).float(), torch.from_numpy(target).float()
 
     def __len__(self):
         return self.data.shape[0]
 
 
 class DatasetFromFile(data.Dataset):
-    def __init__(self, images, input_transform=None, target_transform=None, upscale_factor=None):
+    def __init__(self, images, input_transform=None, target_transform=None, upscale_factor=None, zero_center=False):
         '''
         images:
           if str, a file path
@@ -91,6 +99,7 @@ class DatasetFromFile(data.Dataset):
         self.input_transform = input_transform
         self.target_transform = target_transform
         self.upscale_factor = upscale_factor
+        self.zero_center = zero_center
 
     def __getitem__(self, index):
         '''
@@ -111,6 +120,10 @@ class DatasetFromFile(data.Dataset):
             target = self.target_transform(target)
         else:
             target = ToTensor()(target)
+
+        if self.zero_center:
+            input = input - input.mean()
+            target = target - target.mean()
 
         return input, target
 
