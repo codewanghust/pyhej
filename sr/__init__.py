@@ -125,10 +125,14 @@ def adjust_lr_base(epoch, step=30, init_lr=0.01):
     return lr
 
 
-def adjust_lr_opti(optimizer, epoch, step=30, init_lr=0.01):
+def adjust_lr_opti(optimizer, epoch, step=30, init_lr=0.01, epsilon=1e-7):
     '''Sets the learning rate to the initial LR decayed by 10 every 30 epochs
     '''
     lr = init_lr * (0.1 ** (epoch // step))
+
+    if lr < epsilon:
+        lr = init_lr * 0.1
+
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
