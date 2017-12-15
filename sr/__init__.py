@@ -256,7 +256,7 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
     else:
         img_b = img_b.resize(img_h.size, Image.BICUBIC)
 
-        wid, hei = img_gt.size
+        wid, hei = img_h.size
         out = image_new((wid*2, hei), (0, 0, 0))
         out.paste(img_b, (0, 0))
         out.paste(img_h, (0+wid, 0))
