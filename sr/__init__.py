@@ -166,16 +166,16 @@ def train(cuda, epoch, model, criterion, optimizer, data_loader):
         loss.backward()
         optimizer.step()
 
-        #print('===> Epoch[{}]({}/{}): Loss: {:.4f}'.format(epoch, iteration, len(data_loader), loss.data[0]))
+        #print('===> Epoch[{}]({}/{}): Loss: {:.6f}'.format(epoch, iteration, len(data_loader), loss.data[0]))
         avg_loss += loss.data[0]
 
-    print('===> Epoch[{}]: Avg. Loss: {:.4f}'.format(epoch, avg_loss / len(data_loader)))
+    print('Epoch[{}]:\n===> Train: Avg Loss: {:.6f}'.format(epoch, avg_loss / len(data_loader)))
     return avg_loss / len(data_loader)
 
 
 def test(cuda, epoch, model, criterion, data_loader):
     model.eval()
-    avg_psnr = 0
+    avg_mse = 0
 
     for batch in data_loader:
         inputs, targets = autograd.Variable(batch[0]), autograd.Variable(batch[1])
@@ -190,11 +190,11 @@ def test(cuda, epoch, model, criterion, data_loader):
         # `ToTensor()(PIL Image)`:
         #   Converts a PIL Image or numpy.ndarray (H x W x C) in the range [0, 255]
         #   to (C x H x W) in the range [0.0, 1.0]
-        psnr = 10 * math.log10(1 / loss.data[0])
-        avg_psnr += psnr
+        #psnr = 10 * math.log10(1 / loss.data[0])
+        avg_mse += loss.data[0]
 
-    print('===> Test : Avg. PSNR: {:.4f} dB'.format(avg_psnr / len(data_loader)))
-    return avg_psnr / len(data_loader)
+    print('===> Test : Avg MSE: {:.6f}'.format(avg_mse / len(data_loader)))
+    return avg_mse / len(data_loader)
 
 
 def save_checkpoint(state, save_dir, is_best=False, checkpoint='checkpoint.pth.tar'):
