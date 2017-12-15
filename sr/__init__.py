@@ -253,6 +253,12 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
         out.paste(img_gt, (0, 0))
         out.paste(img_b , (0+wid, 0))
         out.paste(img_h , (0+wid+wid, 0))
+
+        img_gt_y, _, _ = img_gt.convert('YCbCr').split()
+        img_b_y, _, _ = img_b.convert('YCbCr').split()
+        img_h_y, _, _ = img_h.convert('YCbCr').split()
+        psnr_b = PSNR(np.asarray(img_gt_y, dtype=np.float32), np.asarray(img_b_y, dtype=np.float32))
+        psnr_h = PSNR(np.asarray(img_gt_y, dtype=np.float32), np.asarray(img_h_y, dtype=np.float32))
     else:
         img_b = img_b.resize(img_h.size, Image.BICUBIC)
 
@@ -261,11 +267,14 @@ def imprint(img_h, img_b, img_gt=None, text=None, filename=None):
         out.paste(img_b, (0, 0))
         out.paste(img_h, (0+wid, 0))
 
+        psnr_b = None
+        psnr_h = None
+
     if text:
         draw_text(out, (5, 5), text, fill=(255, 0, 0))
 
     if filename:
         out.save(filename)
-        return filename
+        return filename, psnr_b, psnr_h
     else:
-        return out
+        return out, psnr_b, psnr_h
