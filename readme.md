@@ -9,8 +9,7 @@ git submodule add https://gitee.com/flystarhe/pyhej.git
 
 注意,克隆使用子模块的项目,执行`git submodule *`是必要的,否则子模块不可用.比如:
 ```
-git clone https://gitee.com/flystarhe/slyx_mdisp_guess.git
-cd slyx_mdisp_guess
+git clone https://gitee.com/flystarhe/proj_name.git && cd proj_name
 git submodule init
 git submodule update
 ```

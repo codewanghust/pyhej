@@ -4,14 +4,14 @@ import numpy as np
 from PIL import Image
 
 
-def_size = 41
-def_stride = def_size//2
+DEF_SIZE = 41
+DEF_STRIDE = DEF_SIZE//2
 
 
 def dataset_from_file(file_name, save_path, upscale=False):
     data = []
     with codecs.open(file_name, 'r', 'utf-8') as reader:
-        for i, line in enumerate(reader.readlines(), 1):
+        for line in reader.readlines():
             img_b, img_h = line.strip().split(',')
             data.append((img_b, img_h))
 
@@ -23,11 +23,18 @@ def dataset_from_list(data, save_path, upscale=False):
     labels = []
     for img_b, img_h in data:
         try:
-            img_b = Image.open(img_b).convert('YCbCr')
-            img_h = Image.open(img_h).convert('YCbCr')
+            img_b = Image.open(img_b)
+            img_h = Image.open(img_h)
 
-            img_b_y, _, _ = img_b.split()
-            img_h_y, _, _ = img_h.split()
+            if img_b.mode == 'L':
+                img_b_y = img_b
+            else:
+                img_b_y, _, _ = img_b.convert('YCbCr').split()
+
+            if img_h.mode == 'L':
+                img_h_y = img_h
+            else:
+                img_h_y, _, _ = img_h.convert('YCbCr').split()
 
             if upscale:
                 if img_b_y.size != img_h_y.size:
@@ -43,12 +50,12 @@ def dataset_from_list(data, save_path, upscale=False):
         except Exception as e:
             continue
 
-        hs = set(tuple(range(0, img_b_y.shape[1]-def_size, def_stride)) + (img_b_y.shape[1]-def_size,))
-        ws = set(tuple(range(0, img_b_y.shape[2]-def_size, def_stride)) + (img_b_y.shape[2]-def_size,))
+        hs = set(tuple(range(0, img_b_y.shape[1]-DEF_SIZE, DEF_STRIDE)) + (img_b_y.shape[1]-DEF_SIZE,))
+        ws = set(tuple(range(0, img_b_y.shape[2]-DEF_SIZE, DEF_STRIDE)) + (img_b_y.shape[2]-DEF_SIZE,))
         for h in hs:
             for w in ws:
-                inputs.append(img_b_y[:,h:h+def_size,w:w+def_size])
-                labels.append(img_h_y[:,h:h+def_size,w:w+def_size])
+                inputs.append(img_b_y[:,h:h+DEF_SIZE,w:w+DEF_SIZE])
+                labels.append(img_h_y[:,h:h+DEF_SIZE,w:w+DEF_SIZE])
 
     hf = h5py.File(save_path, 'w')
     hf['data'] = np.array(inputs)
@@ -73,9 +80,5 @@ from pyhej.sr.h5 import dataset_from_file, h5info
 
 dataset_from_file('/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_train.txt',
                   '/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_train.h5',
-                  upscale=True)
-
-dataset_from_file('/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_tests.txt',
-                  '/data2/datasets/slyx/mr2_sr_x2/dataset_2_3/dataset_tests.h5',
                   upscale=True)
 '''

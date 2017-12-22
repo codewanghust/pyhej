@@ -11,6 +11,10 @@ pip install pydicom
 
 
 def read_dicominfo(filename):
+    '''
+    read dicom file info
+    filename: as 'your/path/filename.dcm'
+    '''
     try:
         plan = dicom.read_file(filename, force=True)
         temp = {'InstitutionName': plan.InstitutionName,  # 机构
@@ -25,21 +29,22 @@ def read_dicominfo(filename):
                 'ExposureTime': plan.ExposureTime,  # exposure
                 'InstanceNumber': plan.InstanceNumber}  # 序号
     except Exception as e:
-        temp, plan = None, None
+        plan = None
+        temp = None
     return temp, plan
 
 
 def read_dicom(filename):
     '''
-    read dicom file
+    read dicom file images
     filename: as 'your/path/filename.dcm'
-    '''
-    ds = sitk.ReadImage(filename)
-    img_array = sitk.GetArrayFromImage(ds)
     ## import matplotlib.pyplot as plt
     ## frames, wid, hei = img_array.shape
     ## plt.imshow(img_array[frame_num], plt.cm.bone)
     ## plt.show()
+    '''
+    ds = sitk.ReadImage(filename)
+    img_array = sitk.GetArrayFromImage(ds)
     return img_array
 
 
@@ -47,7 +52,7 @@ def img_array_scale(img_array):
     '''
     rescale image values to be within `[0, 255]`
     '''
-    img_array = img_array.astype('float')
+    img_array = img_array.astype(np.float32)
     img_array = img_array + max(-np.min(img_array), 0)
     img_array_max = np.max(img_array)
     if img_array_max > 0:

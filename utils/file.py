@@ -25,7 +25,7 @@ def download(furls, outdir='tmps', prefix=''):
     os.makedirs(outdir)
 
     for i, furl in enumerate(furls):
-        fpath = os.path.join(outdir, '{}{08d}.jpg'.format(prefix, i))
+        fpath = os.path.join(outdir, '{}{:08d}.jpg'.format(prefix, i))
         try:
             urlretrieve(furl, fpath)
         except Exception:

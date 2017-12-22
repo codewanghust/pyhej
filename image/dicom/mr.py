@@ -13,28 +13,32 @@ def seq2str(seq, mode='{:.9f}'):
     return ','.join([mode.format(i) for i in seq])
 
 
-def read_dicominfo(path):
+def read_dicominfo(filename):
+    '''
+    read dicom file info
+    filename: as 'your/path/filename.dcm'
+    '''
     try:
-        plan = dicom.read_file(path, force=True)
+        plan = dicom.read_file(filename, force=True)
         temp = {'PatientID': plan.PatientID,
                 'InstanceNumber': plan.InstanceNumber,
                 'MagneticFieldStrength': plan.MagneticFieldStrength,
                 'ImagePositionPatient': seq2str(plan.ImagePositionPatient),
-                'Path': path}
+                'Path': filename}
     except Exception as e:
         temp, plan = None, None
     return temp, plan
 
 
-def read_dicom(path):
+def read_dicom(filename):
     '''
-    read dicom file
-    path: as 'your/path/filename.dcm'
-    '''
-    ds = sitk.ReadImage(path)
-    img_array = sitk.GetArrayFromImage(ds)
+    read dicom file images
+    filename: as 'your/path/filename.dcm'
     ## import matplotlib.pyplot as plt
     ## frames, wid, hei = img_array.shape
     ## plt.imshow(img_array[frame_num], plt.cm.bone)
     ## plt.show()
+    '''
+    ds = sitk.ReadImage(filename)
+    img_array = sitk.GetArrayFromImage(ds)
     return img_array

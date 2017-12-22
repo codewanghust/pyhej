@@ -6,16 +6,12 @@ from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 
 
-ref_path = os.path.dirname(__file__)
-ref_path = os.path.join(ref_path, '..')
-ref_path = os.path.abspath(ref_path)
-
-
-def_font = ImageFont.truetype(os.path.join(ref_path, 'fonts/DENG.TTF'), size=32)
-def_color = (0, 0, 0)
+import pyhej
 
 
 URL_REGEX = re.compile(r'http://|https://|ftp://')
+DEF_FONT = ImageFont.truetype(os.path.join(pyhej.root, 'datasets/fonts/DENG.TTF'), size=32)
+DEF_COLOR = (0, 0, 0)
 
 
 def load_img(path, mode=None, target_size=None):
@@ -34,7 +30,7 @@ def load_img(path, mode=None, target_size=None):
     # Raises
         ..
     '''
-    assert mode in {None, 'L', 'RGB', 'YCbCr'}, "mode must in {None, 'L', 'RGB', 'YCbCr'}"
+    assert mode in {None, 'L', 'RGB', 'YCbCr'}, "mode error!"
 
     try:
         if URL_REGEX.match(path):
@@ -144,7 +140,7 @@ def image_new(size, color=None):
     color: What color to use for the image, Default is black
     '''
     if color is None:
-        color = def_color
+        color = DEF_COLOR
 
     return Image.new('RGB', size, color)
 
@@ -156,10 +152,10 @@ def draw_text(img, pos, text, font=None, fill=None):
     text: A text
     '''
     if font is None:
-        font = def_font
+        font = DEF_FONT
 
     if fill is None:
-        fill = def_color
+        fill = DEF_COLOR
 
     draw = ImageDraw.Draw(img)
     draw.text(pos, text, font=font, fill=fill)

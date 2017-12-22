@@ -8,6 +8,17 @@ Access: https://www.kaggle.com/c/data-science-bowl-2017
 - 冠军方案,solution-grt123-team,[code](https://github.com/lfz/DSB2017),[doc](https://github.com/lfz/DSB2017/blob/master/solution-grt123-team.pdf)
 - 亚军方案,[summary of julian's](https://www.kaggle.com/c/data-science-bowl-2017/discussion/31551)
 
+### tips
+- [U-Net](https://arxiv.org/abs/1505.04597)
+- [Ultrasound Nerve Segmentation(超声神经分割比赛): 题目](https://www.kaggle.com/c/ultrasound-nerve-segmentation)
+- [Ultrasound Nerve Segmentation(超声神经分割比赛): 方案(U-Net)](https://github.com/jocicmarko/ultrasound-nerve-segmentation)
+- [Data Science Bowl 2017: 官方教程](https://www.kaggle.com/c/data-science-bowl-2017#tutorial)
+- [Data Science Bowl 2017: 官方教程: Code](https://github.com/booz-allen-hamilton/DSB3Tutorial)
+- [Data Science Bowl 2017: 2nd Place: 如何用CNN识别CT图像检测肺癌？](http://www.sohu.com/a/138840776_610300)
+- [Data Science Bowl 2017: 2nd Place: dhammack](https://github.com/dhammack/DSB2017/)
+- [Data Science Bowl 2017: 2nd Place: juliandewit](https://github.com/juliandewit/kaggle_ndsb2017)
+- [Data Science Bowl 2017: Kaggle大赛获奖者分享: 机器学习在预测肺癌工作上的应用以及脚本](http://www.92to.com/xinwen/2017/04-17/20566592.html) + [Notebook](https://www.kaggle.com/arnavkj95/candidate-generation-and-luna16-preprocessing)
+
 ## Kaggle diabetic retinopathy
 High-resolution retinal images that are annotated on a 0–4 severity scale by clinicians, for the detection of diabetic retinopathy. This data set is part of a completed Kaggle competition, which is generally a great source for publicly available data sets.
 

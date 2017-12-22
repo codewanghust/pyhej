@@ -35,10 +35,3 @@ Unet是一个在医学图像处理领域,应用很广泛的网络结构,是一�
 ## Others
 - [LIDC&LUNA16数据说明](http://www.jianshu.com/p/e3e4984833dd?spm=5176.9876270.0.0.3cf4ab00AOROvg)
 - [armamut/Getting the lungs right](https://www.kaggle.com/armamut/getting-the-lungs-right)
-
----
-
-
-数据预处理—肺部区域提取:
-
-![http://aliyuntianchipublic.cn-hangzhou.oss-pub.aliyun-inc.com/public/files/image/1095279155895/1507289164706_7FJAflCvF5.jpg]

@@ -185,4 +185,3 @@ def add_noise(img,sdev = 0.5,avg=10):
     img[:,:,1] = add_noise_single_channel(img[:,:,1])
     img[:,:,2] = add_noise_single_channel(img[:,:,2])
     return img
-
