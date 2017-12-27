@@ -3,7 +3,7 @@
 import os
 import keras
 from keras.preprocessing.image import ImageDataGenerator, DirectoryIterator
-from pyhej.keras.image import load_img, img_to_array
+from pyhej.image import load_img, img_to_array
 
 
 IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm']

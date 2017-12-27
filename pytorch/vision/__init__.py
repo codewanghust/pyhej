@@ -1,7 +1,7 @@
 import math
 import torch
 import numpy as np
-from pyhej.keras.image import load_img, img_to_array, array_to_img
+from pyhej.image import load_img, img_to_array, array_to_img
 
 
 def make_grid(tensor, nrow=8, padding=2, normalize=False, scale_each=False, pad_value=0):

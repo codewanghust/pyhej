@@ -1,5 +1,5 @@
 import numpy as np
-from pyhej.keras.image import load_img, img_to_array
+from pyhej.image import load_img, img_to_array
 
 
 def predict_on_batch(model, data, datagen, target_size=None):

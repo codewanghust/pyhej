@@ -21,4 +21,4 @@ image_view.image_show_path(['./temp/%03d.jpg'%i for i in range(len(txts))], col=
 image_view.image_show_imgs(imgs, col=3, height=0.3, mode='bgr').show()
 ```
 
-![](readme_01.png)
+![](readme01.png)

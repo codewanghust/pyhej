@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from pyhej.keras.image import load_img
+from pyhej.image import load_img
 
 
 def image_show_path(imgs, col=5, height=1.0, target_size=None):

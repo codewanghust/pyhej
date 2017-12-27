@@ -5,7 +5,7 @@
 import cv2
 
 
-def eval_of_laplacian(image_path, threshold=100):
+def quality_of_laplacian(image_path, threshold=100):
     '''http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_gradients/py_gradients.html
     http://python.jobbole.com/83702/
     这种方法凑效的原因就在于拉普拉斯算子定义本身:
@@ -21,7 +21,7 @@ def eval_of_laplacian(image_path, threshold=100):
     return res>threshold, res
 
 
-def eval_of_reblur(image_path, ksize=5):
+def quality_of_reblur(image_path, ksize=5):
     '''
     如果图像模糊了,对它进行一次模糊处理,高频分量变化不大
     如果原图是清晰的,对它进行一次模糊处理,高频分量变化会非常大
@@ -37,7 +37,7 @@ def eval_of_reblur(image_path, ksize=5):
     return (res-res_blur)/res
 
 
-def eval_of_sobel(image_path, ksize=5):
+def quality_of_sobel(image_path, ksize=5):
     '''http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_gradients/py_gradients.html
     '''
     img = cv2.imread(image_path)
@@ -55,12 +55,12 @@ def eval_of_sobel(image_path, ksize=5):
 '''
 import cv2
 from matplotlib import pyplot as plt
-from pyhej.utils.image_quality import eval_of_laplacian
+from pyhej.image.image_quality import quality_of_laplacian
 
 plt.figure(figsize=(16, 16))
 for i in range(4):
     image_path = '/data2/datasets/blurred-pictures/{}.jpg'.format(i+1)
     plt.subplot(2,2,i+1), plt.imshow(cv2.imread(image_path, 0), cmap='gray')
-    plt.title(eval_of_laplacian(image_path)), plt.xticks([]), plt.yticks([])
+    plt.title(quality_of_laplacian(image_path)), plt.xticks([]), plt.yticks([])
 plt.show()
 '''

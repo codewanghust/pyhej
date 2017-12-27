@@ -104,4 +104,3 @@ ax.imshow(c, plt.cm.bone)
 ax.set_title('c')
 plt.show()
 '''
-

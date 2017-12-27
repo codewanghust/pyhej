@@ -9,7 +9,7 @@ import torch
 import torch.autograd as autograd
 import torch.utils.data as data
 from torchvision.transforms import ToTensor
-from pyhej.pillow import image_new, draw_text
+from pyhej.image.pillow import image_new, draw_text
 
 
 def PSNR(pred, gt):
