@@ -20,10 +20,10 @@ def read_dicominfo(filename):
     '''
     try:
         plan = dicom.read_file(filename, force=True)
-        temp = {'PatientID': plan.PatientID,
-                'InstanceNumber': plan.InstanceNumber,
-                'MagneticFieldStrength': plan.MagneticFieldStrength,
-                'ImagePositionPatient': seq2str(plan.ImagePositionPatient),
+        temp = {'PatientID': plan.PatientID,  # 病人
+                'InstanceNumber': plan.InstanceNumber,  # 序号
+                'MagneticFieldStrength': plan.MagneticFieldStrength,  # 强度
+                'ImagePositionPatient': seq2str(plan.ImagePositionPatient),  # 位置
                 'Path': filename}
     except Exception as e:
         temp, plan = None, None
