@@ -19,7 +19,7 @@
 ### 新增数据
 上传数据到服务器:
 
-    $ scp -r mb1_base_may_80/ root@118.190.99.177:/root/hej/mb1_base_may_80_new
+    $ scp -qr mb1_base_may_80/ root@118.190.99.177:/root/hej/mb1_base_may_80_new
 
 首先拷贝数据到容器中:
 
@@ -35,7 +35,7 @@ http://118.190.99.177:9000/tool.html?tool.html?username=flystarhe&mode=f&folder=
 
 下载数据到本地:
 
-    $ scp -r root@118.190.99.177:/root/hej/mb1_base_may_80_mask/ mb1_base_may_80_mask
+    $ scp -qr root@118.190.99.177:/root/hej/mb1_base_may_80_mask/ mb1_base_may_80_mask
 
 ### 图像集合
 通过在命令行上运行以下命令来创建要标记的图像集合:
